@@ -49,4 +49,26 @@ These map to the parts in [02-architecture.md](02-architecture.md).
 
 ## Actual modules (filled in as we build)
 
-*(Nothing here yet — the app is still the empty starter. First real module arrives in M2.)*
+### SttEngine (built — M2)
+- **File:** `app/src/main/java/com/itantra/app/SttEngine.kt`
+- **What:** loads the offline Moonshine English model and transcribes a whole recorded clip.
+- **Why offline/full-clip:** it sees the entire sentence at once, so it is far more accurate than a
+  streaming model, and it matches the problem statement ("after detecting pauses... form the sentences").
+- **How:** wraps sherpa-onnx's `OfflineRecognizer`. `transcribe(samples)` creates a stream, feeds the
+  audio, decodes, and returns the text. Model files are read from `assets/`, so it runs with no internet.
+
+### MainActivity (built — M2)
+- **File:** `app/src/main/java/com/itantra/app/MainActivity.kt`
+- **What:** the screen and the push-to-talk recording logic.
+- **Why:** gives the user a simple way to record and see the transcript; PTT also keeps the mic off
+  except while the button is held, which removes background-noise pickup.
+- **How:** loads the model on a background thread; while the button is held, `AudioRecord` captures
+  16 kHz mono audio into memory; on release, the clip is sent to `SttEngine.transcribe()` and the
+  result is appended to the on-screen transcript.
+
+### sherpa-onnx bindings (added — M2)
+- **Files:** `app/src/main/java/com/k2fsa/sherpa/onnx/*.kt`
+- **What:** the official sherpa-onnx Kotlin API. We call into these; we did not modify them.
+- **Why:** they bridge our Kotlin code to the sherpa-onnx C++ engine (the `.so` native libraries).
+
+*(AudioPlayback, TtsEngine, Vad, and Transport arrive in later milestones.)*
