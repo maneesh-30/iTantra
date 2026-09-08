@@ -1,0 +1,8 @@
+/build
+
+# Large ML model files and native libraries are NOT committed (they exceed GitHub's
+# 100 MB limit). Fetch them with scripts/download-models.ps1 (Windows) or
+# scripts/download-models.sh (Linux/Mac). See docs/SETUP.md.
+/src/main/assets/*.onnx
+/src/main/assets/tokens.txt
+/src/main/jniLibs/
