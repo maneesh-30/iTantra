@@ -40,7 +40,24 @@ Before building anything custom, we tested that the speech engines actually run 
 
 - Created a fresh Android Studio project: name `iTantra`, package `com.itantra.app`, language Kotlin, minimum Android version API 24 (so it runs on old, cheap phones).
 - Gradle build succeeded.
-- (In progress) Running the empty "Hello World" app on the Redmi to confirm our toolchain can build and install our own app on the phone.
+- Ran the empty "Hello World" app on the Redmi — toolchain confirmed: we can build and install our own app on the phone.
+
+## 2026-09-08 — Speech-to-text working in our app (Milestone M2)
+
+- Integrated the sherpa-onnx engine into our app: native libraries (`jniLibs/`), the Kotlin
+  API bindings, and a bundled English model in `assets/`.
+- First attempt used a **streaming** recognizer. Two problems showed up:
+  1. Garbled output ("0", numbers) — caused by using the int8 decoder; fixed by using the float decoder.
+  2. Low accuracy, and it transcribed background noise.
+- Root cause of the accuracy problem: a small **streaming** model sees little context. The problem
+  statement actually asks for sentence-level transcription after a pause, not live streaming.
+- **Corrected approach:** switched to a full-clip **offline** recognizer (Moonshine base-en) triggered
+  by **push-to-talk** — hold the button, speak a sentence, release, and the whole clip is transcribed.
+  This is more accurate (full context) and matches the walkie-talkie mode in the problem statement.
+  It also removes the noise problem, because the microphone is only on while the button is held.
+- Result: accurate English speech-to-text, fully offline, on the Redmi. M2 done.
+- Note on model delivery: model and native-library files are large, so they are not stored in git;
+  `scripts/download-models.*` fetches them. See [../SETUP.md](../SETUP.md).
 
 ---
 
