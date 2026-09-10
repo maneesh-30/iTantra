@@ -6,4 +6,6 @@
 /src/main/assets/*.onnx
 /src/main/assets/tokens.txt
 /src/main/assets/tts/
+/src/main/assets/hi-stt/
+/src/main/assets/hi-tts/
 /src/main/jniLibs/
