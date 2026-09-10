@@ -71,4 +71,27 @@ These map to the parts in [02-architecture.md](02-architecture.md).
 - **What:** the official sherpa-onnx Kotlin API. We call into these; we did not modify them.
 - **Why:** they bridge our Kotlin code to the sherpa-onnx C++ engine (the `.so` native libraries).
 
-*(AudioPlayback, TtsEngine, Vad, and Transport arrive in later milestones.)*
+### TtsEngine (built — M3)
+- **File:** `app/src/main/java/com/itantra/app/TtsEngine.kt`
+- **What:** turns text into speech audio offline, using a Piper VITS English voice via sherpa-onnx.
+- **How:** on first run it copies the `espeak-ng-data` folder from assets to app storage (Piper needs
+  it on the real filesystem), then `synthesize(text)` returns audio samples.
+
+### AudioPlayback (built — M3)
+- **File:** `app/src/main/java/com/itantra/app/AudioPlayback.kt`
+- **What:** plays audio samples through the speaker with `AudioTrack`.
+- **Why:** the listener must hear the message; alerts must be unmissable.
+- **How:** waits for the audio to finish before stopping. For alerts it forces maximum volume and
+  peak-normalizes the samples so they are clearly louder.
+
+### Transport + WifiTransport (built — M5)
+- **Files:** `Transport.kt` (interface), `WifiTransport.kt` (implementation)
+- **What:** carries text between phones. `Transport` is a small swappable interface
+  (`send` / `onMessage`); `WifiTransport` implements it over the local WiFi network.
+- **Why swappable:** WiFi is only for the demo. A LoRa implementation (long range) will plug into the
+  same interface later without changing the rest of the app.
+- **How:** channel-based like a walkie-talkie — same channel name = same group. Uses UDP broadcast so
+  one phone reaches everyone on the channel, and sends to each interface's directed broadcast so it
+  works over a phone hotspot too. Holds a WiFi lock so it keeps receiving while idle.
+
+*(Vad for phone mode, and a LoRa transport, arrive in later milestones.)*
