@@ -5,6 +5,12 @@
     <!-- Needed so the app can record from the microphone for speech-to-text. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- Needed to send/receive text between phones over the local WiFi network. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
