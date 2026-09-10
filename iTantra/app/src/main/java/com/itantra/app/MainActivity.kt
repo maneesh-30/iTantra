@@ -9,6 +9,8 @@ import android.media.MediaRecorder
 import android.os.Bundle
 import android.view.MotionEvent
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -34,7 +36,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvStatus: TextView
     private lateinit var tvTranscript: TextView
 
+    private lateinit var etTts: EditText
+    private lateinit var cbAlert: CheckBox
+    private lateinit var btnSpeak: Button
+
+    private lateinit var etChannel: EditText
+    private lateinit var btnConnect: Button
+    private lateinit var cbSendAlert: CheckBox
+
     private var stt: SttEngine? = null
+    private var tts: TtsEngine? = null
+    private val playback by lazy { AudioPlayback(this) }
+    private val transport: Transport by lazy { WifiTransport(this) }
+
+    @Volatile
+    private var connected = false
 
     @Volatile
     private var isRecording = false
@@ -71,6 +87,76 @@ class MainActivity : AppCompatActivity() {
                 stt = engine
                 btnRecord.isEnabled = true
                 tvStatus.text = "Ready. Hold the button and speak (English)."
+            }
+        }
+
+        // --- Text-to-speech test controls ---
+        etTts = findViewById(R.id.etTts)
+        cbAlert = findViewById(R.id.cbAlert)
+        btnSpeak = findViewById(R.id.btnSpeak)
+        btnSpeak.isEnabled = false
+
+        // Load the TTS voice in the background too.
+        thread {
+            val engine = TtsEngine(this)
+            runOnUiThread {
+                tts = engine
+                btnSpeak.isEnabled = true
+            }
+        }
+
+        btnSpeak.setOnClickListener {
+            val text = etTts.text.toString().trim()
+            if (text.isEmpty()) return@setOnClickListener
+            val engine = tts ?: return@setOnClickListener
+            val alert = cbAlert.isChecked
+            btnSpeak.isEnabled = false
+            tvStatus.text = "Speaking..."
+            thread {
+                try {
+                    val audio = engine.synthesize(text)
+                    android.util.Log.i(
+                        "iTantraTTS",
+                        "generated samples=${audio.samples.size} sampleRate=${audio.sampleRate}"
+                    )
+                    playback.play(audio.samples, audio.sampleRate, alert)
+                    android.util.Log.i("iTantraTTS", "playback finished")
+                } catch (e: Throwable) {
+                    android.util.Log.e("iTantraTTS", "TTS failed", e)
+                }
+                runOnUiThread {
+                    btnSpeak.isEnabled = true
+                    tvStatus.text = "Ready. Hold the button and speak (English)."
+                }
+            }
+        }
+
+        // --- Channel connect controls ---
+        etChannel = findViewById(R.id.etChannel)
+        btnConnect = findViewById(R.id.btnConnect)
+        cbSendAlert = findViewById(R.id.cbSendAlert)
+
+        transport.setOnMessage { msg -> onIncoming(msg) }
+
+        btnConnect.setOnClickListener {
+            if (connected) {
+                transport.stop()
+                connected = false
+                btnConnect.text = "Connect"
+                tvStatus.text = "Disconnected."
+                window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                val ch = etChannel.text.toString().trim()
+                if (ch.isEmpty()) {
+                    tvStatus.text = "Enter a channel name first."
+                    return@setOnClickListener
+                }
+                transport.start(ch)
+                connected = true
+                btnConnect.text = "Disconnect"
+                tvStatus.text = "On channel \"$ch\". Hold to talk."
+                // Keep the screen on while connected so WiFi stays awake to receive.
+                window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
         }
 
@@ -181,19 +267,43 @@ class MainActivity : AppCompatActivity() {
             val engine = stt
             val text = engine?.transcribe(samples, sampleRate)?.trim().orEmpty()
             if (text.isNotEmpty()) {
-                transcript.append(text).append("\n")
+                appendLine("You: $text")
+                if (connected) transport.send(text, cbSendAlert.isChecked)
             }
             runOnUiThread {
-                tvTranscript.text = transcript.toString()
-                tvStatus.text = "Ready. Hold the button and speak (English)."
+                tvStatus.text =
+                    if (connected) "On channel. Hold to talk." else "Ready. Hold to talk."
             }
         }
+    }
+
+    /** A message arrived from another phone: show it and speak it aloud. */
+    private fun onIncoming(msg: Message) {
+        appendLine("${msg.from}: ${msg.text}")
+        val engine = tts ?: return
+        thread {
+            try {
+                val audio = engine.synthesize(msg.text)
+                playback.play(audio.samples, audio.sampleRate, msg.alert)
+            } catch (e: Throwable) {
+                android.util.Log.e("iTantraTTS", "failed to speak incoming message", e)
+            }
+        }
+    }
+
+    /** Append a line to the message list, on the UI thread. */
+    private fun appendLine(line: String) {
+        transcript.append(line).append("\n")
+        runOnUiThread { tvTranscript.text = transcript.toString() }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         isRecording = false
         recordThread?.join(500)
+        transport.stop()
+        playback.stop()
         stt?.release()
+        tts?.release()
     }
 }
