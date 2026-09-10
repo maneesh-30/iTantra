@@ -10,53 +10,52 @@ import com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig
 import java.io.File
 
 /**
- * TtsEngine — the text-to-speech module.
+ * TtsEngine — the text-to-speech module, now per-language.
  *
- * Turns text into speech audio, fully offline, using sherpa-onnx with a VITS (Piper)
- * English voice. The model and tokens are read straight from the app's assets.
+ * Offline speech synthesis using sherpa-onnx with Piper VITS voices:
+ *   - English: en_US-lessac-medium
+ *   - Hindi:   hi_IN-rohan-medium
  *
- * One wrinkle: Piper voices need an "espeak-ng-data" folder to turn text into the sounds
- * of speech, and that folder must live on the real filesystem (it cannot be read from
- * inside the APK). So on first run we copy it from assets to the app's private storage,
- * then point the engine at that copied path.
+ * Both are Piper voices, so both need the same `espeak-ng-data` folder (which turns text into
+ * the sounds of speech). Piper needs it on the real filesystem, so on first run we copy the
+ * shared copy (bundled once under assets/tts/espeak-ng-data) into app storage and point every
+ * language's voice at it.
  */
-class TtsEngine(context: Context) {
+class TtsEngine(context: Context, val language: Language) {
 
     private val tts: OfflineTts
 
     init {
-        // Copy espeak-ng-data from assets to app storage (once).
+        // Copy the shared espeak-ng-data from assets to app storage (once).
         val dataDir = File(context.filesDir, "espeak-ng-data")
         if (!dataDir.exists() || dataDir.listFiles().isNullOrEmpty()) {
             copyAssetDir(context.assets, "tts/espeak-ng-data", dataDir)
         }
 
+        val vits = when (language) {
+            Language.EN -> OfflineTtsVitsModelConfig(
+                model = "tts/en_US-lessac-medium.onnx",
+                tokens = "tts/tokens.txt",
+                dataDir = dataDir.absolutePath,
+            )
+            Language.HI -> OfflineTtsVitsModelConfig(
+                model = "hi-tts/hi_IN-rohan-medium.onnx",
+                tokens = "hi-tts/tokens.txt",
+                dataDir = dataDir.absolutePath,
+            )
+        }
+
         val config = OfflineTtsConfig(
-            model = OfflineTtsModelConfig(
-                vits = OfflineTtsVitsModelConfig(
-                    model = "tts/en_US-lessac-medium.onnx", // asset path
-                    tokens = "tts/tokens.txt",              // asset path
-                    dataDir = dataDir.absolutePath,         // real filesystem path
-                ),
-                numThreads = 2,
-                debug = true, // print sherpa-onnx logs to logcat while we debug
-            ),
+            model = OfflineTtsModelConfig(vits = vits, numThreads = 2),
         )
 
         tts = OfflineTts(context.assets, config)
     }
 
-    /** The sample rate of the audio this voice produces (needed to play it back). */
     fun sampleRate(): Int = tts.sampleRate()
 
-    /**
-     * Turn text into speech audio.
-     * @param speed 1.0 = normal; lower = slower, higher = faster.
-     * @return samples in -1.0..1.0 plus the sample rate.
-     */
-    fun synthesize(text: String, speed: Float = 1.0f): GeneratedAudio {
-        return tts.generate(text = text, sid = 0, speed = speed)
-    }
+    fun synthesize(text: String, speed: Float = 1.0f): GeneratedAudio =
+        tts.generate(text = text, sid = 0, speed = speed)
 
     fun release() {
         tts.release()
@@ -66,13 +65,11 @@ class TtsEngine(context: Context) {
     private fun copyAssetDir(assets: AssetManager, assetPath: String, outDir: File) {
         val children = assets.list(assetPath) ?: emptyArray()
         if (children.isEmpty()) {
-            // It's a file: copy it.
             outDir.parentFile?.mkdirs()
             assets.open(assetPath).use { input ->
                 outDir.outputStream().use { output -> input.copyTo(output) }
             }
         } else {
-            // It's a directory: recurse into each child.
             outDir.mkdirs()
             for (child in children) {
                 copyAssetDir(assets, "$assetPath/$child", File(outDir, child))
