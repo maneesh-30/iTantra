@@ -5,4 +5,5 @@
 # scripts/download-models.sh (Linux/Mac). See docs/SETUP.md.
 /src/main/assets/*.onnx
 /src/main/assets/tokens.txt
+/src/main/assets/tts/
 /src/main/jniLibs/
