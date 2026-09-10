@@ -8,9 +8,12 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.view.MotionEvent
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -43,6 +46,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var etChannel: EditText
     private lateinit var btnConnect: Button
     private lateinit var cbSendAlert: CheckBox
+    private lateinit var spinnerLang: Spinner
+
+    private var currentLanguage = Language.EN
 
     private var stt: SttEngine? = null
     private var tts: TtsEngine? = null
@@ -78,32 +84,13 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Load the model off the main thread (it takes a moment) and keep the UI responsive.
-        btnRecord.isEnabled = false
-        tvStatus.text = "Loading model..."
-        thread {
-            val engine = SttEngine(assets)
-            runOnUiThread {
-                stt = engine
-                btnRecord.isEnabled = true
-                tvStatus.text = "Ready. Hold the button and speak (English)."
-            }
-        }
-
         // --- Text-to-speech test controls ---
         etTts = findViewById(R.id.etTts)
         cbAlert = findViewById(R.id.cbAlert)
         btnSpeak = findViewById(R.id.btnSpeak)
+        btnRecord.isEnabled = false
         btnSpeak.isEnabled = false
-
-        // Load the TTS voice in the background too.
-        thread {
-            val engine = TtsEngine(this)
-            runOnUiThread {
-                tts = engine
-                btnSpeak.isEnabled = true
-            }
-        }
+        // STT + TTS engines are loaded by the language picker below (its first selection loads them).
 
         btnSpeak.setOnClickListener {
             val text = etTts.text.toString().trim()
@@ -173,6 +160,49 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 else -> false
+            }
+        }
+
+        // --- Language picker. Its first selection also triggers the initial engine load. ---
+        spinnerLang = findViewById(R.id.spinnerLang)
+        val langs = Language.entries
+        spinnerLang.adapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_dropdown_item, langs.map { it.display }
+        )
+        spinnerLang.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p: AdapterView<*>?, v: android.view.View?, pos: Int, id: Long) {
+                if (langs[pos] != currentLanguage || stt == null) reloadEngines(langs[pos])
+            }
+            override fun onNothingSelected(p: AdapterView<*>?) {}
+        }
+    }
+
+    /** Release any current engines and load STT + TTS for the chosen language. */
+    private fun reloadEngines(lang: Language) {
+        currentLanguage = lang
+        btnRecord.isEnabled = false
+        btnSpeak.isEnabled = false
+        tvStatus.text = "Loading ${lang.display} models..."
+        thread {
+            stt?.release()
+            tts?.release()
+            stt = null
+            tts = null
+            try {
+                val newStt = SttEngine(assets, lang)
+                val newTts = TtsEngine(this, lang)
+                runOnUiThread {
+                    stt = newStt
+                    tts = newTts
+                    btnRecord.isEnabled = true
+                    btnSpeak.isEnabled = true
+                    tvStatus.text = "Ready (${lang.display}). Hold to talk."
+                }
+            } catch (e: Throwable) {
+                android.util.Log.e("iTantraStt", "failed to load ${lang.display} models", e)
+                runOnUiThread {
+                    tvStatus.text = "Failed to load ${lang.display} models. See logs."
+                }
             }
         }
     }
@@ -266,9 +296,10 @@ class MainActivity : AppCompatActivity() {
 
             val engine = stt
             val text = engine?.transcribe(samples, sampleRate)?.trim().orEmpty()
+            android.util.Log.i("iTantraStt", "lang=${engine?.language} text=[$text]")
             if (text.isNotEmpty()) {
                 appendLine("You: $text")
-                if (connected) transport.send(text, cbSendAlert.isChecked)
+                if (connected) transport.send(text, cbSendAlert.isChecked, currentLanguage.code)
             }
             runOnUiThread {
                 tvStatus.text =

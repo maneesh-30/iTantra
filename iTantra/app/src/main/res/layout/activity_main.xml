@@ -14,6 +14,27 @@
         android:textSize="16sp"
         android:paddingBottom="8dp" />
 
+    <!-- Language picker -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Language: "
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinnerLang"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
     <!-- Channel: type the same name on both phones to connect -->
     <LinearLayout
         android:layout_width="match_parent"
