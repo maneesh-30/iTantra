@@ -12,20 +12,51 @@
         android:layout_height="wrap_content"
         android:text="Starting..."
         android:textSize="16sp"
-        android:paddingBottom="12dp" />
+        android:paddingBottom="8dp" />
+
+    <!-- Channel: type the same name on both phones to connect -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
+
+        <EditText
+            android:id="@+id/etChannel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Channel (e.g. RESCUE-1)"
+            android:inputType="text"
+            android:text="iTantra"
+            android:minHeight="48dp" />
+
+        <Button
+            android:id="@+id/btnConnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Connect" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnRecord"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start" />
+        android:text="Hold to Talk" />
+
+    <CheckBox
+        android:id="@+id/cbSendAlert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send as alert" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Transcript:"
+        android:text="Messages:"
         android:textStyle="bold"
-        android:paddingTop="16dp"
+        android:paddingTop="12dp"
         android:paddingBottom="4dp" />
 
     <ScrollView
@@ -40,5 +71,49 @@
             android:textSize="18sp"
             android:text="" />
     </ScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="#CCCCCC" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Text to speech (local test):"
+        android:textStyle="bold"
+        android:paddingBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etTts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Type text to speak"
+        android:inputType="text"
+        android:minHeight="48dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="4dp">
+
+        <Button
+            android:id="@+id/btnSpeak"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Speak" />
+
+        <CheckBox
+            android:id="@+id/cbAlert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:text="Alert" />
+    </LinearLayout>
 
 </LinearLayout>
