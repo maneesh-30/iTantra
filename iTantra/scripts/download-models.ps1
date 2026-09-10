@@ -47,4 +47,27 @@ Copy-Item "$vd\en_US-lessac-medium.onnx" $ttsDir -Force
 Copy-Item "$vd\tokens.txt"               $ttsDir -Force
 Copy-Item "$vd\espeak-ng-data"           $ttsDir -Recurse -Force
 
+# --- Hindi models ---
+$hiSttUrl = 'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.tar.bz2'
+$hiTtsUrl = 'https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-hi_IN-rohan-medium-int8.tar.bz2'
+Write-Host 'Downloading Hindi STT (Whisper base, ~198 MB)...'
+Invoke-WebRequest -Uri $hiSttUrl -OutFile "$tmp\hi-stt.tar.bz2" -UseBasicParsing
+Write-Host 'Downloading Hindi TTS (Piper, ~20 MB)...'
+Invoke-WebRequest -Uri $hiTtsUrl -OutFile "$tmp\hi-tts.tar.bz2" -UseBasicParsing
+tar -xjf "$tmp\hi-stt.tar.bz2" -C $tmp
+tar -xjf "$tmp\hi-tts.tar.bz2" -C $tmp
+
+$hiSttDir = Join-Path $assets 'hi-stt'
+New-Item -ItemType Directory -Force -Path $hiSttDir | Out-Null
+$ds = "$tmp\sherpa-onnx-whisper-base"
+Copy-Item "$ds\base-encoder.int8.onnx" $hiSttDir -Force
+Copy-Item "$ds\base-decoder.int8.onnx" $hiSttDir -Force
+Copy-Item "$ds\base-tokens.txt"        $hiSttDir -Force
+
+$hiTtsDir = Join-Path $assets 'hi-tts'
+New-Item -ItemType Directory -Force -Path $hiTtsDir | Out-Null
+$hv = "$tmp\vits-piper-hi_IN-rohan-medium-int8"
+Copy-Item "$hv\hi_IN-rohan-medium.onnx" $hiTtsDir -Force
+Copy-Item "$hv\tokens.txt"              $hiTtsDir -Force
+
 Write-Host 'Done. Models and native libraries are in place.'
