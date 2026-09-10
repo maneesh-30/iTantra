@@ -59,6 +59,32 @@ Before building anything custom, we tested that the speech engines actually run 
 - Note on model delivery: model and native-library files are large, so they are not stored in git;
   `scripts/download-models.*` fetches them. See [../SETUP.md](../SETUP.md).
 
+## 2026-09-10 — Text-to-speech working (Milestone M3)
+
+- Added an offline English voice (Piper VITS `en_US-lessac-medium`) via sherpa-onnx.
+- `TtsEngine` turns text into audio. Piper needs an `espeak-ng-data` folder on the real
+  filesystem, so on first run we copy it from assets into app storage and point the engine there.
+- `AudioPlayback` plays the audio through the speaker. A first bug cut playback off after ~0.1s
+  (we stopped the track right after writing, before it finished); fixed by waiting for the
+  audio buffer to drain. Alert messages play at maximum volume and are peak-normalized so they
+  are clearly louder, matching the emergency-alert requirement.
+- Result: type text, phone speaks it aloud, fully offline. M3 done.
+
+## 2026-09-10 — Two-phone walkie-talkie loop (Milestone M5)
+
+- Added a swappable `Transport` interface and a `WifiTransport` that carries text between phones.
+- Model: channel-based, like a walkie-talkie. Both phones type the same channel name to join the
+  same group. Uses UDP **broadcast** (not multicast — many hotspots silently drop multicast).
+- Fixes found during testing on two phones:
+  - WiFi went to sleep after a few minutes and stopped receiving; fixed with a WiFi lock and by
+    keeping the screen on while connected.
+  - On a phone hotspot, the host's `255.255.255.255` broadcast did not reach clients; fixed by
+    also sending to each network interface's directed broadcast (e.g. `192.168.x.255`).
+- Result: speak on either phone, the text crosses over WiFi, and the other phone speaks it aloud.
+  Confirmed working both directions. This is the core end-to-end demo.
+- Reminder: WiFi is only the demo transport. The real long-range link is LoRa (see M7), which
+  plugs into the same `Transport` interface.
+
 ---
 
 ## The milestone plan
