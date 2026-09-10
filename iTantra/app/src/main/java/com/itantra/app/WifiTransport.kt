@@ -94,6 +94,7 @@ class WifiTransport(private val context: Context) : Transport {
                         text = obj.optString("text"),
                         alert = obj.optBoolean("alert", false),
                         from = obj.optString("from", "phone"),
+                        lang = obj.optString("lang", "en"),
                     )
                     Log.i("iTantraNet", "deliver: ${msg.from}: ${msg.text}")
                     mainHandler.post { onMessage?.invoke(msg) }
@@ -104,7 +105,7 @@ class WifiTransport(private val context: Context) : Transport {
         }
     }
 
-    override fun send(text: String, alert: Boolean) {
+    override fun send(text: String, alert: Boolean, lang: String) {
         val s = socket ?: return
         val ch = channel
         thread {
@@ -115,6 +116,7 @@ class WifiTransport(private val context: Context) : Transport {
                     .put("alert", alert)
                     .put("text", text)
                     .put("from", deviceName)
+                    .put("lang", lang)
                     .toString()
                 val bytes = json.toByteArray(Charsets.UTF_8)
 

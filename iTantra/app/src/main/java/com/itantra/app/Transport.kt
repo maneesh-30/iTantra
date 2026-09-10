@@ -10,6 +10,7 @@ data class Message(
     val text: String,
     val alert: Boolean,
     val from: String,
+    val lang: String,
 )
 
 /**
@@ -26,8 +27,8 @@ interface Transport {
     /** Join a channel and start sending/receiving. */
     fun start(channel: String)
 
-    /** Send a text message to everyone on the channel. */
-    fun send(text: String, alert: Boolean)
+    /** Send a text message to everyone on the channel. `lang` is the language code of the text. */
+    fun send(text: String, alert: Boolean, lang: String)
 
     /** Called on the app's main thread whenever a message arrives from someone else. */
     fun setOnMessage(handler: (Message) -> Unit)
