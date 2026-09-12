@@ -48,9 +48,9 @@ cp "$VD/tokens.txt"               "$ASSETS/tts/"
 cp -r "$VD/espeak-ng-data"        "$ASSETS/tts/"
 
 # --- Hindi models ---
-HI_STT_URL='https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.tar.bz2'
+HI_STT_URL='https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2'
 HI_TTS_URL='https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-hi_IN-rohan-medium-int8.tar.bz2'
-echo 'Downloading Hindi STT (Whisper base, ~198 MB)...'
+echo 'Downloading Hindi STT (Whisper small, ~610 MB)...'
 curl -L "$HI_STT_URL" -o "$TMP/hi-stt.tar.bz2"
 echo 'Downloading Hindi TTS (Piper, ~20 MB)...'
 curl -L "$HI_TTS_URL" -o "$TMP/hi-tts.tar.bz2"
@@ -58,10 +58,10 @@ tar -xjf "$TMP/hi-stt.tar.bz2" -C "$TMP"
 tar -xjf "$TMP/hi-tts.tar.bz2" -C "$TMP"
 
 mkdir -p "$ASSETS/hi-stt"
-DS="$TMP/sherpa-onnx-whisper-base"
-cp "$DS/base-encoder.int8.onnx" "$ASSETS/hi-stt/"
-cp "$DS/base-decoder.int8.onnx" "$ASSETS/hi-stt/"
-cp "$DS/base-tokens.txt"        "$ASSETS/hi-stt/"
+DS="$TMP/sherpa-onnx-whisper-small"
+cp "$DS/small-encoder.int8.onnx" "$ASSETS/hi-stt/"
+cp "$DS/small-decoder.onnx"      "$ASSETS/hi-stt/"   # float decoder (int8 degenerates)
+cp "$DS/small-tokens.txt"        "$ASSETS/hi-stt/"
 
 mkdir -p "$ASSETS/hi-tts"
 HV="$TMP/vits-piper-hi_IN-rohan-medium-int8"
