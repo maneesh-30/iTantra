@@ -40,12 +40,12 @@ class SttEngine(assetManager: AssetManager, val language: Language) {
             Language.HI -> OfflineModelConfig(
                 // Whisper multilingual, forced to Hindi so it never guesses the wrong language.
                 whisper = OfflineWhisperModelConfig(
-                    encoder = "hi-stt/base-encoder.int8.onnx",
-                    decoder = "hi-stt/base-decoder.int8.onnx",
+                    encoder = "hi-stt/small-encoder.int8.onnx",
+                    decoder = "hi-stt/small-decoder.onnx",  // float: int8 decoder degenerates into repeated tokens
                     language = "hi",
                     task = "transcribe",
                 ),
-                tokens = "hi-stt/base-tokens.txt",
+                tokens = "hi-stt/small-tokens.txt",
                 numThreads = 2,
                 debug = true, // print whisper language/task to logcat while debugging
             )
