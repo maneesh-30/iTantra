@@ -48,9 +48,9 @@ Copy-Item "$vd\tokens.txt"               $ttsDir -Force
 Copy-Item "$vd\espeak-ng-data"           $ttsDir -Recurse -Force
 
 # --- Hindi models ---
-$hiSttUrl = 'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.tar.bz2'
+$hiSttUrl = 'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2'
 $hiTtsUrl = 'https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-hi_IN-rohan-medium-int8.tar.bz2'
-Write-Host 'Downloading Hindi STT (Whisper base, ~198 MB)...'
+Write-Host 'Downloading Hindi STT (Whisper small, ~610 MB)...'
 Invoke-WebRequest -Uri $hiSttUrl -OutFile "$tmp\hi-stt.tar.bz2" -UseBasicParsing
 Write-Host 'Downloading Hindi TTS (Piper, ~20 MB)...'
 Invoke-WebRequest -Uri $hiTtsUrl -OutFile "$tmp\hi-tts.tar.bz2" -UseBasicParsing
@@ -59,10 +59,10 @@ tar -xjf "$tmp\hi-tts.tar.bz2" -C $tmp
 
 $hiSttDir = Join-Path $assets 'hi-stt'
 New-Item -ItemType Directory -Force -Path $hiSttDir | Out-Null
-$ds = "$tmp\sherpa-onnx-whisper-base"
-Copy-Item "$ds\base-encoder.int8.onnx" $hiSttDir -Force
-Copy-Item "$ds\base-decoder.int8.onnx" $hiSttDir -Force
-Copy-Item "$ds\base-tokens.txt"        $hiSttDir -Force
+$ds = "$tmp\sherpa-onnx-whisper-small"
+Copy-Item "$ds\small-encoder.int8.onnx" $hiSttDir -Force
+Copy-Item "$ds\small-decoder.onnx"      $hiSttDir -Force   # float decoder (int8 degenerates)
+Copy-Item "$ds\small-tokens.txt"        $hiSttDir -Force
 
 $hiTtsDir = Join-Path $assets 'hi-tts'
 New-Item -ItemType Directory -Force -Path $hiTtsDir | Out-Null
