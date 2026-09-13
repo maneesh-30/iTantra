@@ -4,137 +4,219 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/field_bg">
 
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Starting..."
-        android:textSize="16sp"
-        android:paddingBottom="8dp" />
-
-    <!-- Language picker -->
+    <!-- Header bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="8dp">
+        android:background="@color/brand"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Language: "
-            android:textStyle="bold" />
-
-        <Spinner
-            android:id="@+id/spinnerLang"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <!-- Channel: type the same name on both phones to connect -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="8dp">
-
-        <EditText
-            android:id="@+id/etChannel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Channel (e.g. RESCUE-1)"
-            android:inputType="text"
             android:text="iTantra"
-            android:minHeight="48dp" />
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvConnPill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/pill_status_offline"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:text="Offline"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Your name -->
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/chip_card"
+            android:hint="Your name"
+            android:inputType="textPersonName|textCapWords"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:minHeight="48dp"
+            android:textColor="@color/ink"
+            android:textColorHint="@color/muted" />
+
+        <!-- Language + Channel row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/chip_card"
+                android:paddingStart="12dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LANGUAGE"
+                    android:textColor="@color/muted"
+                    android:textSize="10sp" />
+
+                <Spinner
+                    android:id="@+id/spinnerLang"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/chip_card"
+                android:paddingStart="12dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CHANNEL"
+                    android:textColor="@color/muted"
+                    android:textSize="10sp" />
+
+                <EditText
+                    android:id="@+id/etChannel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:hint="RESCUE-1"
+                    android:inputType="text"
+                    android:text="iTantra"
+                    android:textColor="@color/ink"
+                    android:textColorHint="@color/muted"
+                    android:textSize="15sp"
+                    android:minHeight="0dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="0dp" />
+            </LinearLayout>
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnConnect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Connect" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/btnRecord"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hold to Talk" />
-
-    <CheckBox
-        android:id="@+id/cbSendAlert"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send as alert" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Messages:"
-        android:textStyle="bold"
-        android:paddingTop="12dp"
-        android:paddingBottom="4dp" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/tvTranscript"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="" />
-    </ScrollView>
+            android:layout_marginTop="10dp"
+            android:text="Connect"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/brand" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="#CCCCCC" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Text to speech (local test):"
-        android:textStyle="bold"
-        android:paddingBottom="4dp" />
-
-    <EditText
-        android:id="@+id/etTts"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Type text to speak"
-        android:inputType="text"
-        android:minHeight="48dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="4dp">
-
-        <Button
-            android:id="@+id/btnSpeak"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Speak" />
-
-        <CheckBox
-            android:id="@+id/cbAlert"
+        <!-- People in the room -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:paddingStart="12dp"
-            android:text="Alert" />
-    </LinearLayout>
+            android:layout_marginTop="12dp"
+            android:text="IN THIS ROOM"
+            android:textColor="@color/muted"
+            android:textSize="10sp" />
 
+        <LinearLayout
+            android:id="@+id/pillContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp" />
+
+        <!-- Push-to-talk -->
+        <FrameLayout
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/ptt_ring">
+
+            <Button
+                android:id="@+id/btnRecord"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:background="@drawable/ptt_bg"
+                android:text="Hold to Talk"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:stateListAnimator="@null" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Starting..."
+            android:textColor="@color/muted"
+            android:textSize="13sp" />
+
+        <CheckBox
+            android:id="@+id/cbSendAlert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:buttonTint="@color/danger"
+            android:text="Send as alert"
+            android:textColor="@color/danger" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="MESSAGES"
+            android:textColor="@color/muted"
+            android:textSize="10sp" />
+
+        <ScrollView
+            android:id="@+id/scrollMessages"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/tvTranscript"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ink"
+                android:textSize="16sp"
+                android:text="" />
+        </ScrollView>
+
+    </LinearLayout>
 </LinearLayout>
