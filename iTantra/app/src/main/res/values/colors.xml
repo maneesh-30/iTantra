@@ -2,4 +2,18 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- iTantra "Rescue / Field" palette: high-contrast, readable outdoors. -->
+    <color name="brand">#E8590C</color>        <!-- safety orange -->
+    <color name="brand_dark">#C74E0A</color>   <!-- pressed orange -->
+    <color name="brand_tint">#FBE0D0</color>   <!-- soft orange (rings, pills) -->
+    <color name="field_bg">#F5F5F0</color>     <!-- page background -->
+    <color name="ink">#1A1A1A</color>          <!-- primary text -->
+    <color name="muted">#8A887F</color>        <!-- secondary text -->
+    <color name="card">#FFFFFFFF</color>
+    <color name="card_border">#E0DED6</color>
+    <color name="success">#2F9E44</color>      <!-- connected -->
+    <color name="danger">#E03131</color>       <!-- alerts -->
+    <color name="danger_tint">#FCEBEB</color>
+    <color name="danger_dark">#A32D2D</color>
 </resources>
