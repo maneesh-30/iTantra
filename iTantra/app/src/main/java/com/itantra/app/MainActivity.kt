@@ -8,11 +8,13 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -21,32 +23,28 @@ import androidx.core.content.ContextCompat
 import kotlin.concurrent.thread
 
 /**
- * MainActivity — the screen.
+ * MainActivity — the single screen.
  *
- * Push-to-talk (PTT) flow, matching the problem statement's walkie-talkie mode:
- *   1. On app open, load the offline STT model in the background.
- *   2. User HOLDS the button and speaks one sentence. The microphone records only
- *      while the button is held (so background noise is not captured).
- *   3. On RELEASE, the whole recorded clip is transcribed at once (full-clip = accurate)
- *      and the text is added to the transcript.
- *
- * Milestone M2 (corrected): offline full-clip speech -> text, on this one phone.
- * Transport to another phone (M5) and text -> speech (M3) come later.
+ * Push-to-talk (PTT) walkie-talkie flow:
+ *   1. Pick a language; the offline STT + TTS models load in the background.
+ *   2. Type your name + a channel, then Connect. Everyone on the same channel is in the room.
+ *   3. HOLD the button and speak one sentence; on RELEASE the whole clip is transcribed
+ *      (full-clip = accurate), shown, and the text is sent to the channel.
+ *   4. Incoming messages are shown and spoken aloud (TTS). Alerts play at max volume.
  */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var btnRecord: Button
     private lateinit var tvStatus: TextView
     private lateinit var tvTranscript: TextView
+    private lateinit var tvConnPill: TextView
 
-    private lateinit var etTts: EditText
-    private lateinit var cbAlert: CheckBox
-    private lateinit var btnSpeak: Button
-
+    private lateinit var etName: EditText
     private lateinit var etChannel: EditText
     private lateinit var btnConnect: Button
     private lateinit var cbSendAlert: CheckBox
     private lateinit var spinnerLang: Spinner
+    private lateinit var pillContainer: LinearLayout
 
     private var currentLanguage = Language.EN
 
@@ -73,7 +71,14 @@ class MainActivity : AppCompatActivity() {
         btnRecord = findViewById(R.id.btnRecord)
         tvStatus = findViewById(R.id.tvStatus)
         tvTranscript = findViewById(R.id.tvTranscript)
-        btnRecord.text = "Hold to Talk"
+        tvConnPill = findViewById(R.id.tvConnPill)
+        etName = findViewById(R.id.etName)
+        etChannel = findViewById(R.id.etChannel)
+        btnConnect = findViewById(R.id.btnConnect)
+        cbSendAlert = findViewById(R.id.cbSendAlert)
+        pillContainer = findViewById(R.id.pillContainer)
+
+        btnRecord.isEnabled = false
 
         // Ask for microphone permission up front so it is ready when the user talks.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
@@ -84,45 +89,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // --- Text-to-speech test controls ---
-        etTts = findViewById(R.id.etTts)
-        cbAlert = findViewById(R.id.cbAlert)
-        btnSpeak = findViewById(R.id.btnSpeak)
-        btnRecord.isEnabled = false
-        btnSpeak.isEnabled = false
-        // STT + TTS engines are loaded by the language picker below (its first selection loads them).
-
-        btnSpeak.setOnClickListener {
-            val text = etTts.text.toString().trim()
-            if (text.isEmpty()) return@setOnClickListener
-            val engine = tts ?: return@setOnClickListener
-            val alert = cbAlert.isChecked
-            btnSpeak.isEnabled = false
-            tvStatus.text = "Speaking..."
-            thread {
-                try {
-                    val audio = engine.synthesize(text)
-                    android.util.Log.i(
-                        "iTantraTTS",
-                        "generated samples=${audio.samples.size} sampleRate=${audio.sampleRate}"
-                    )
-                    playback.play(audio.samples, audio.sampleRate, alert)
-                    android.util.Log.i("iTantraTTS", "playback finished")
-                } catch (e: Throwable) {
-                    android.util.Log.e("iTantraTTS", "TTS failed", e)
-                }
-                runOnUiThread {
-                    btnSpeak.isEnabled = true
-                    tvStatus.text = "Ready. Hold the button and speak (English)."
-                }
-            }
-        }
-
-        // --- Channel connect controls ---
-        etChannel = findViewById(R.id.etChannel)
-        btnConnect = findViewById(R.id.btnConnect)
-        cbSendAlert = findViewById(R.id.cbSendAlert)
-
         transport.setOnMessage { msg -> onIncoming(msg) }
 
         btnConnect.setOnClickListener {
@@ -131,17 +97,29 @@ class MainActivity : AppCompatActivity() {
                 connected = false
                 btnConnect.text = "Connect"
                 tvStatus.text = "Disconnected."
+                setConnPill(false)
+                pillContainer.removeAllViews()
                 window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             } else {
+                val name = etName.text.toString().trim()
+                if (name.isEmpty()) {
+                    tvStatus.text = "Enter your name first."
+                    return@setOnClickListener
+                }
                 val ch = etChannel.text.toString().trim()
                 if (ch.isEmpty()) {
                     tvStatus.text = "Enter a channel name first."
                     return@setOnClickListener
                 }
+                transport.setDisplayName(name)
                 transport.start(ch)
                 connected = true
                 btnConnect.text = "Disconnect"
                 tvStatus.text = "On channel \"$ch\". Hold to talk."
+                setConnPill(true)
+                // Show your own name pill in the room.
+                pillContainer.removeAllViews()
+                addPill("$name (you)")
                 // Keep the screen on while connected so WiFi stays awake to receive.
                 window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
@@ -177,11 +155,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Update the header connection pill. */
+    private fun setConnPill(online: Boolean) {
+        tvConnPill.text = if (online) "On air" else "Offline"
+        tvConnPill.setBackgroundResource(
+            if (online) R.drawable.pill_status_online else R.drawable.pill_status_offline
+        )
+    }
+
+    /** Add one name pill to the "in this room" row. */
+    private fun addPill(name: String) {
+        val dp = resources.displayMetrics.density
+        val pill = TextView(this).apply {
+            text = name
+            setBackgroundResource(R.drawable.pill_name)
+            setTextColor(ContextCompat.getColor(this@MainActivity, R.color.brand_dark))
+            textSize = 13f
+            val padH = (12 * dp).toInt()
+            val padV = (5 * dp).toInt()
+            setPadding(padH, padV, padH, padV)
+        }
+        val lp = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply { marginEnd = (8 * dp).toInt() }
+        pillContainer.addView(pill, lp)
+    }
+
     /** Release any current engines and load STT + TTS for the chosen language. */
     private fun reloadEngines(lang: Language) {
         currentLanguage = lang
         btnRecord.isEnabled = false
-        btnSpeak.isEnabled = false
         tvStatus.text = "Loading ${lang.display} models..."
         thread {
             stt?.release()
@@ -195,7 +198,6 @@ class MainActivity : AppCompatActivity() {
                     stt = newStt
                     tts = newTts
                     btnRecord.isEnabled = true
-                    btnSpeak.isEnabled = true
                     tvStatus.text = "Ready (${lang.display}). Hold to talk."
                 }
             } catch (e: Throwable) {
@@ -253,8 +255,8 @@ class MainActivity : AppCompatActivity() {
 
         recordedChunks.clear()
         isRecording = true
-        tvStatus.text = "Recording... release to send."
-        btnRecord.text = "Recording..."
+        tvStatus.text = "Listening... release to send."
+        btnRecord.text = "Listening..."
         recorder.startRecording()
 
         recordThread = thread {
