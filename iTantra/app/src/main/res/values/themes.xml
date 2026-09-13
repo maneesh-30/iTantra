@@ -1,8 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ITantra" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!--
+      Fixed LIGHT theme (was Material3.DayNight, which turned the app dark/purple in dark mode).
+      We pin a light "rescue/field" look so it always renders the same on stage.
+    -->
+    <style name="Base.Theme.ITantra" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/brand</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorError">@color/danger</item>
+        <item name="android:colorBackground">@color/field_bg</item>
+        <item name="android:windowBackground">@color/field_bg</item>
+        <item name="android:statusBarColor">@color/brand</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="Theme.ITantra" parent="Base.Theme.ITantra" />
