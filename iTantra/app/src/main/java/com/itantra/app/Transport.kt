@@ -30,6 +30,9 @@ interface Transport {
     /** Send a text message to everyone on the channel. `lang` is the language code of the text. */
     fun send(text: String, alert: Boolean, lang: String)
 
+    /** Set the name shown to others as the sender of your messages. */
+    fun setDisplayName(name: String)
+
     /** Called on the app's main thread whenever a message arrives from someone else. */
     fun setOnMessage(handler: (Message) -> Unit)
 

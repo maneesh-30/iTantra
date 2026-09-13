@@ -35,6 +35,9 @@ class WifiTransport(private val context: Context) : Transport {
     private val selfId = UUID.randomUUID().toString()
     private val deviceName = Build.MODEL ?: "phone"
 
+    // Name others see as the sender. Defaults to the device model until the user sets one.
+    @Volatile private var displayName = deviceName
+
     private var channel: String = ""
     private var socket: DatagramSocket? = null
     private var multicastLock: WifiManager.MulticastLock? = null
@@ -46,6 +49,11 @@ class WifiTransport(private val context: Context) : Transport {
 
     override fun setOnMessage(handler: (Message) -> Unit) {
         onMessage = handler
+    }
+
+    override fun setDisplayName(name: String) {
+        val trimmed = name.trim()
+        displayName = if (trimmed.isEmpty()) deviceName else trimmed
     }
 
     override fun start(channel: String) {
@@ -115,7 +123,7 @@ class WifiTransport(private val context: Context) : Transport {
                     .put("ch", ch)
                     .put("alert", alert)
                     .put("text", text)
-                    .put("from", deviceName)
+                    .put("from", displayName)
                     .put("lang", lang)
                     .toString()
                 val bytes = json.toByteArray(Charsets.UTF_8)
