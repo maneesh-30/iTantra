@@ -3,17 +3,29 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- iTantra "Rescue / Field" palette: high-contrast, readable outdoors. -->
-    <color name="brand">#E8590C</color>        <!-- safety orange -->
-    <color name="brand_dark">#C74E0A</color>   <!-- pressed orange -->
-    <color name="brand_tint">#FBE0D0</color>   <!-- soft orange (rings, pills) -->
-    <color name="field_bg">#F5F5F0</color>     <!-- page background -->
-    <color name="ink">#1A1A1A</color>          <!-- primary text -->
-    <color name="muted">#8A887F</color>        <!-- secondary text -->
-    <color name="card">#FFFFFFFF</color>
-    <color name="card_border">#E0DED6</color>
-    <color name="success">#2F9E44</color>      <!-- connected -->
-    <color name="danger">#E03131</color>       <!-- alerts -->
-    <color name="danger_tint">#FCEBEB</color>
-    <color name="danger_dark">#A32D2D</color>
+    <!-- EchoWave "Blackout Amber" — tactical dark, high-contrast. -->
+    <color name="bg">#0B0B0C</color>            <!-- page background -->
+    <color name="card">#16160F</color>          <!-- mission header / cards -->
+    <color name="card_border">#2A281E</color>
+    <color name="surface2">#201E14</color>       <!-- other-person bubble, chips, pills -->
+
+    <color name="amber">#F5A623</color>          <!-- primary accent -->
+    <color name="amber_dark">#D98E12</color>     <!-- pressed -->
+    <color name="on_amber">#241A05</color>       <!-- text on amber -->
+    <color name="name_accent">#FFD68A</color>    <!-- sender names -->
+
+    <color name="ink">#F0EDE3</color>            <!-- primary text -->
+    <color name="muted">#8A8474</color>          <!-- secondary text -->
+
+    <color name="success">#4ADE80</color>        <!-- online dot -->
+    <color name="danger">#FF5C5C</color>         <!-- alerts -->
+    <color name="danger_tint">#2A1414</color>    <!-- alert bubble bg -->
+    <color name="danger_text">#FFB3B3</color>
+
+    <!-- legacy names kept so any older drawable refs still resolve -->
+    <color name="brand">#F5A623</color>
+    <color name="brand_dark">#D98E12</color>
+    <color name="brand_tint">#201E14</color>
+    <color name="field_bg">#0B0B0C</color>
+    <color name="danger_dark">#FFB3B3</color>
 </resources>
