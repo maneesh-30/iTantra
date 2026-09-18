@@ -44,6 +44,12 @@ class WifiTransport(private val context: Context) : Transport {
     private var wifiLock: WifiManager.WifiLock? = null
     @Volatile private var running = false
 
+    // Each message carries a unique id; we drop ids we've already seen so the same message
+    // (sent twice and to several broadcast addresses for reliability) is shown/spoken only once.
+    private val seenIds = object : LinkedHashMap<String, Boolean>(300, 0.75f, false) {
+        override fun removeEldestEntry(eldest: Map.Entry<String, Boolean>) = size > 300
+    }
+
     private var onMessage: ((Message) -> Unit)? = null
     private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -98,6 +104,11 @@ class WifiTransport(private val context: Context) : Transport {
                     val obj = JSONObject(json)
                     if (obj.optString("id") == selfId) continue          // ignore our own
                     if (obj.optString("ch") != this.channel) continue    // wrong channel
+                    val mid = obj.optString("mid")
+                    if (mid.isNotEmpty()) {
+                        val dup = synchronized(seenIds) { seenIds.put(mid, true) != null }
+                        if (dup) continue                                 // already shown this message
+                    }
                     val msg = Message(
                         text = obj.optString("text"),
                         alert = obj.optBoolean("alert", false),
@@ -120,6 +131,7 @@ class WifiTransport(private val context: Context) : Transport {
             try {
                 val json = JSONObject()
                     .put("id", selfId)
+                    .put("mid", UUID.randomUUID().toString())
                     .put("ch", ch)
                     .put("alert", alert)
                     .put("text", text)
