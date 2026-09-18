@@ -36,6 +36,13 @@ interface Transport {
     /** Called on the app's main thread whenever a message arrives from someone else. */
     fun setOnMessage(handler: (Message) -> Unit)
 
+    /**
+     * Called on the app's main thread with the current list of other people on the channel,
+     * whenever it changes. Presence is kept live by a periodic "I'm here" heartbeat: someone
+     * appears within ~2s of joining and drops off ~6s after they leave or go out of range.
+     */
+    fun setOnRoster(handler: (List<String>) -> Unit)
+
     /** Leave the channel and free resources. */
     fun stop()
 }
