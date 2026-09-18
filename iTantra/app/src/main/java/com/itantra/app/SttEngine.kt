@@ -4,9 +4,9 @@ import android.content.res.AssetManager
 import com.k2fsa.sherpa.onnx.FeatureConfig
 import com.k2fsa.sherpa.onnx.OfflineModelConfig
 import com.k2fsa.sherpa.onnx.OfflineMoonshineModelConfig
+import com.k2fsa.sherpa.onnx.OfflineNemoEncDecCtcModelConfig
 import com.k2fsa.sherpa.onnx.OfflineRecognizer
 import com.k2fsa.sherpa.onnx.OfflineRecognizerConfig
-import com.k2fsa.sherpa.onnx.OfflineWhisperModelConfig
 
 /**
  * SttEngine — the speech-to-text module, now per-language.
@@ -14,8 +14,9 @@ import com.k2fsa.sherpa.onnx.OfflineWhisperModelConfig
  * Offline, full-clip recognition (record a whole sentence, then transcribe). Which model it
  * loads depends on the language:
  *   - English: Moonshine base-en (fast, accurate for English).
- *   - Hindi:   Whisper base (multilingual), with the language forced to "hi" so it always
- *              transcribes Hindi. (Dolphin was tried first but auto-detected the wrong language.)
+ *   - Hindi:   AI4Bharat IndicConformer (NeMo CTC), purpose-built for Indian languages
+ *              (clearly more accurate than Whisper small on Hindi; one shared vocab across
+ *              all Indian languages, so the same recipe extends to Telugu, Tamil, etc.).
  *
  * Model files are read from the app's assets, so everything runs on the phone with no internet.
  */
@@ -38,16 +39,13 @@ class SttEngine(assetManager: AssetManager, val language: Language) {
             )
 
             Language.HI -> OfflineModelConfig(
-                // Whisper multilingual, forced to Hindi so it never guesses the wrong language.
-                whisper = OfflineWhisperModelConfig(
-                    encoder = "hi-stt/small-encoder.int8.onnx",
-                    decoder = "hi-stt/small-decoder.onnx",  // float: int8 decoder degenerates into repeated tokens
-                    language = "hi",
-                    task = "transcribe",
+                // AI4Bharat IndicConformer (NeMo CTC), purpose-built for Indian languages.
+                // Beat Whisper small clearly on Hindi and is a single model file.
+                nemo = OfflineNemoEncDecCtcModelConfig(
+                    model = "hi-stt-ic/model.int8.onnx",
                 ),
-                tokens = "hi-stt/small-tokens.txt",
+                tokens = "hi-stt-ic/tokens.txt",
                 numThreads = 2,
-                debug = true, // print whisper language/task to logcat while debugging
             )
         }
 
