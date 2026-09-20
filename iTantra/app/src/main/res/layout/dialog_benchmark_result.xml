@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/card_mission"
+    android:padding="24dp"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Benchmark Results"
+        android:textColor="@color/amber"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvDlgSub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="English · 10 sentences"
+        android:textColor="@color/muted"
+        android:textSize="13sp"
+        android:paddingTop="2dp"
+        android:paddingBottom="18dp" />
+
+    <TextView
+        android:id="@+id/tvDlgWer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0.0%"
+        android:textColor="@color/amber"
+        android:textSize="46sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Word Error Rate (lower is better)"
+        android:textColor="@color/ink"
+        android:textSize="13sp"
+        android:paddingBottom="18dp" />
+
+    <TextView
+        android:id="@+id/tvDlgRtf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0.00"
+        android:textColor="@color/amber"
+        android:textSize="46sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Avg Real-Time Factor (&lt; 1 = faster than real time)"
+        android:textColor="@color/ink"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/tvDlgFoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="On-device · offline · IndicConformer int8"
+        android:textColor="@color/muted"
+        android:textSize="12sp"
+        android:paddingTop="16dp" />
+
+    <Button
+        android:id="@+id/btnDlgClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Close"
+        android:textColor="@color/on_amber"
+        android:backgroundTint="@color/amber" />
+</LinearLayout>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="WER Benchmark"
+            android:textColor="@color/amber"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1 / 10"
+            android:textColor="@color/muted"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Loading model…"
+        android:textColor="@color/muted"
+        android:textSize="13sp"
+        android:paddingBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="READ THIS ALOUD"
+        android:textColor="@color/muted"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/tvReference"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_mission"
+        android:padding="16dp"
+        android:layout_marginTop="6dp"
+        android:text="—"
+        android:textColor="@color/ink"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnRead"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/holdbar"
+        android:text="Hold to Read"
+        android:textStyle="bold"
+        android:textColor="@color/on_amber"
+        android:stateListAnimator="@null" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="APP HEARD"
+        android:textColor="@color/muted"
+        android:textSize="11sp"
+        android:paddingTop="16dp" />
+
+    <TextView
+        android:id="@+id/tvHyp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pill_name"
+        android:padding="14dp"
+        android:layout_marginTop="6dp"
+        android:text="—"
+        android:textColor="@color/ink"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tvSentenceMetrics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text=""
+        android:textColor="@color/amber"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Next"
+        android:textColor="@color/on_amber"
+        android:backgroundTint="@color/amber"
+        android:enabled="false" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="12dp"
+        android:background="@color/card_border" />
+
+    <TextView
+        android:id="@+id/tvOverall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Overall WER: —     Avg RTF: —"
+        android:textColor="@color/ink"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvOverallSub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Read each sentence and tap Next. Lower WER and RTF are better."
+        android:textColor="@color/muted"
+        android:textSize="12sp"
+        android:paddingTop="4dp" />
+</LinearLayout>
