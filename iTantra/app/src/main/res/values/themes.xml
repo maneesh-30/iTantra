@@ -1,13 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Fixed dark "Blackout Amber" theme — always renders the same on stage. -->
-    <style name="Base.Theme.ITantra" parent="Theme.Material3.Dark.NoActionBar">
+    <!-- Fixed soft-blue LIGHT theme. -->
+    <style name="Base.Theme.ITantra" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/amber</item>
         <item name="colorOnPrimary">@color/on_amber</item>
         <item name="colorError">@color/danger</item>
         <item name="android:colorBackground">@color/bg</item>
         <item name="android:windowBackground">@color/bg</item>
         <item name="android:statusBarColor">@color/bg</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:textColorPrimary">@color/ink</item>
         <item name="android:textColorHint">@color/muted</item>
     </style>

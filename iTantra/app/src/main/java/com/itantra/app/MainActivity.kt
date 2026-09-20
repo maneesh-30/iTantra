@@ -364,14 +364,14 @@ class MainActivity : AppCompatActivity() {
                 else -> "$from · $now"
             }
             setTextColor(ContextCompat.getColor(this@MainActivity,
-                when { alert -> R.color.danger; mine -> R.color.on_amber; else -> R.color.name_accent }))
+                when { alert -> R.color.danger; mine -> R.color.own_ink; else -> R.color.name_accent }))
         }
         val body = TextView(this).apply {
             this.text = text
             textSize = 15f
             maxWidth = maxW
             setTextColor(ContextCompat.getColor(this@MainActivity,
-                when { alert -> R.color.danger_text; mine -> R.color.on_amber; else -> R.color.ink }))
+                when { alert -> R.color.danger_text; mine -> R.color.own_ink; else -> R.color.ink }))
         }
         bubble.addView(header)
         bubble.addView(body)
