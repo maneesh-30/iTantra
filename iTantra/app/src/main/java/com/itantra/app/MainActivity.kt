@@ -2,6 +2,7 @@ package com.itantra.app
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var spinnerLang: Spinner
     private lateinit var btnJoin: Button
     private lateinit var tvJoinStatus: TextView
+    private lateinit var btnBenchmark: TextView
 
     // App (Talk + Radar)
     private lateinit var appScreen: View
@@ -102,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         spinnerLang = findViewById(R.id.spinnerLang)
         btnJoin = findViewById(R.id.btnJoin)
         tvJoinStatus = findViewById(R.id.tvJoinStatus)
+        btnBenchmark = findViewById(R.id.btnBenchmark)
 
         appScreen = findViewById(R.id.appScreen)
         tvChannel = findViewById(R.id.tvChannel)
@@ -145,6 +148,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnJoin.setOnClickListener { joinChannel() }
+        btnBenchmark.setOnClickListener {
+            startActivity(Intent(this, BenchmarkActivity::class.java).putExtra("lang", currentLanguage.code))
+        }
         btnLeave.setOnClickListener { leaveChannel() }
         btnTabChat.setOnClickListener { showTab(chat = true) }
         btnTabRadar.setOnClickListener { showTab(chat = false) }

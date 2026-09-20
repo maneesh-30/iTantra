@@ -83,6 +83,17 @@
             android:text="Loading models…"
             android:textColor="@color/muted"
             android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/btnBenchmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp"
+            android:text="Run accuracy benchmark (WER)"
+            android:textColor="@color/amber"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <!-- ============ SCREEN 2+3: APP (Chat / Radar) ============ -->
