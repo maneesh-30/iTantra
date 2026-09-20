@@ -252,6 +252,27 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Room radar"
+                    android:textColor="@color/ink"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:paddingTop="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Live view of who is connected on this channel.\nYou are at the centre; others appear as they join."
+                    android:textColor="@color/muted"
+                    android:textSize="13sp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:paddingTop="4dp" />
+
                 <com.itantra.app.RadarView
                     android:id="@+id/radar"
                     android:layout_width="match_parent"
@@ -262,9 +283,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Everyone you've heard on this channel"
+                    android:text="Someone drops off the radar about 6 seconds after they leave or lose signal."
                     android:textColor="@color/muted"
                     android:textSize="12sp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
                     android:paddingBottom="16dp" />
             </LinearLayout>
         </FrameLayout>

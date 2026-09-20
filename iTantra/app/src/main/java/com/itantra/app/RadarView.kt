@@ -1,11 +1,15 @@
 package com.itantra.app
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
+import android.graphics.SweepGradient
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.min
@@ -22,13 +26,13 @@ class RadarView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyle: Int = 0
 ) : View(context, attrs, defStyle) {
 
-    private val amber = Color.parseColor("#F5A623")
-    private val onAmber = Color.parseColor("#241A05")
-    private val blip = Color.parseColor("#FFD68A")
-    private val ring = Color.parseColor("#2A281E")
-    private val ring2 = Color.parseColor("#1E1B12")
-    private val ink = Color.parseColor("#F0EDE3")
-    private val muted = Color.parseColor("#8A8474")
+    private val amber = Color.parseColor("#3B6FE0")
+    private val onAmber = Color.parseColor("#FFFFFF")
+    private val blip = Color.parseColor("#3B6FE0")
+    private val ring = Color.parseColor("#D6DEEA")
+    private val ring2 = Color.parseColor("#E6E9F0")
+    private val ink = Color.parseColor("#1A1D21")
+    private val muted = Color.parseColor("#8A93A3")
 
     private val d = resources.displayMetrics.density
     private fun dp(v: Float) = v * d
@@ -49,6 +53,33 @@ class RadarView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
     }
 
+    // Rotating radar sweep.
+    private val sweepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+    private val sweepLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = dp(2f)
+        color = amber
+    }
+    private var sweepAngle = 0f
+    private var animator: ValueAnimator? = null
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        animator = ValueAnimator.ofFloat(0f, 360f).apply {
+            duration = 3500
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = LinearInterpolator()
+            addUpdateListener { sweepAngle = it.animatedValue as Float; postInvalidateOnAnimation() }
+            start()
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        animator?.cancel()
+        animator = null
+        super.onDetachedFromWindow()
+    }
+
     override fun onDraw(canvas: Canvas) {
         val cx = width / 2f
         val cy = height / 2f
@@ -60,6 +91,20 @@ class RadarView @JvmOverloads constructor(
         ringPaint.color = ring
         canvas.drawCircle(cx, cy, maxR * 0.62f, ringPaint)
         canvas.drawCircle(cx, cy, maxR * 0.32f, ringPaint)
+
+        // rotating sweep: a fading tail (SweepGradient) plus a crisp leading line
+        val trail = Color.argb(70, Color.red(amber), Color.green(amber), Color.blue(amber))
+        val shader = SweepGradient(cx, cy, intArrayOf(Color.TRANSPARENT, trail), null)
+        val m = Matrix().apply { setRotate(sweepAngle, cx, cy) }
+        shader.setLocalMatrix(m)
+        sweepPaint.shader = shader
+        canvas.drawCircle(cx, cy, maxR, sweepPaint)
+        val rad = (sweepAngle - 90.0) * PI / 180.0
+        canvas.drawLine(
+            cx, cy,
+            cx + (maxR * cos(rad)).toFloat(), cy + (maxR * sin(rad)).toFloat(),
+            sweepLinePaint
+        )
 
         // centre = You
         fillPaint.color = amber
