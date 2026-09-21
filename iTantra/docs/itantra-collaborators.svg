@@ -1,0 +1,57 @@
+<svg viewBox="0 0 1124 185" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <rect x="0" y="0" width="1124" height="185" fill="#FFFFFF"/>
+
+  <!-- 1 NDMA / NDRF -->
+  <rect x="8" y="16" width="212" height="150" rx="14" fill="#FFF6E4" stroke="#E8A317"/>
+  <circle cx="114" cy="60" r="26" fill="#FCEBCB"/>
+  <g transform="translate(114,60)" stroke="#B06A0F" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,-15 L13,-9 V3 C13,11 0,17 0,17 C0,17 -13,11 -13,3 V-9 Z"/>
+    <path d="M0,-5 V5 M-5,0 H5"/>
+  </g>
+  <text x="114" y="112" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">NDMA / NDRF</text>
+  <text x="114" y="134" font-size="12" fill="#6B5E49" text-anchor="middle">disaster &amp; rescue</text>
+  <text x="114" y="150" font-size="12" fill="#6B5E49" text-anchor="middle">response</text>
+
+  <!-- 2 State Disaster Authorities -->
+  <rect x="232" y="16" width="212" height="150" rx="14" fill="#FFF6E4" stroke="#E8A317"/>
+  <circle cx="338" cy="60" r="26" fill="#FCEBCB"/>
+  <g transform="translate(338,60)" stroke="#B06A0F" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-15,-5 L0,-14 L15,-5 Z"/>
+    <line x1="-11" y1="-1" x2="-11" y2="9"/><line x1="-4" y1="-1" x2="-4" y2="9"/><line x1="4" y1="-1" x2="4" y2="9"/><line x1="11" y1="-1" x2="11" y2="9"/>
+    <line x1="-15" y1="13" x2="15" y2="13"/>
+  </g>
+  <text x="338" y="112" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">State Disaster</text>
+  <text x="338" y="132" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Authorities</text>
+  <text x="338" y="152" font-size="12" fill="#6B5E49" text-anchor="middle">deployment &amp; drills</text>
+
+  <!-- 3 Defence & Border Forces -->
+  <rect x="456" y="16" width="212" height="150" rx="14" fill="#FFF6E4" stroke="#E8A317"/>
+  <circle cx="562" cy="60" r="26" fill="#FCEBCB"/>
+  <path transform="translate(562,60)" d="M0,-15 L4.5,-4.7 15,-4.7 6.5,2 9.5,12.5 0,6 -9.5,12.5 -6.5,2 -15,-4.7 -4.5,-4.7 Z" fill="#B06A0F"/>
+  <text x="562" y="112" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Defence &amp; Border</text>
+  <text x="562" y="132" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Forces</text>
+  <text x="562" y="152" font-size="12" fill="#6B5E49" text-anchor="middle">field patrols</text>
+
+  <!-- 4 AI4Bharat / Bhashini -->
+  <rect x="680" y="16" width="212" height="150" rx="14" fill="#FFF6E4" stroke="#E8A317"/>
+  <circle cx="786" cy="60" r="26" fill="#FCEBCB"/>
+  <g transform="translate(786,60)">
+    <rect x="-15" y="-13" width="30" height="22" rx="5" fill="none" stroke="#B06A0F" stroke-width="2.2"/>
+    <path d="M-6,9 l0,7 l8,-7 Z" fill="#B06A0F"/>
+    <text x="0" y="4" font-size="16" font-weight="700" fill="#B06A0F" text-anchor="middle">अ</text>
+  </g>
+  <text x="786" y="112" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">AI4Bharat /</text>
+  <text x="786" y="132" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Bhashini</text>
+  <text x="786" y="152" font-size="12" fill="#6B5E49" text-anchor="middle">language models</text>
+
+  <!-- 5 Rural Connectivity / CSR -->
+  <rect x="904" y="16" width="212" height="150" rx="14" fill="#FFF6E4" stroke="#E8A317"/>
+  <circle cx="1010" cy="60" r="26" fill="#FCEBCB"/>
+  <g transform="translate(1010,60)" stroke="#B06A0F" stroke-width="2.2" fill="none">
+    <line x1="-11" y1="-8" x2="9" y2="-8"/><line x1="-11" y1="-8" x2="0" y2="10"/><line x1="9" y1="-8" x2="0" y2="10"/>
+    <circle cx="-11" cy="-8" r="4.5" fill="#B06A0F" stroke="none"/><circle cx="9" cy="-8" r="4.5" fill="#B06A0F" stroke="none"/><circle cx="0" cy="10" r="4.5" fill="#B06A0F" stroke="none"/>
+  </g>
+  <text x="1010" y="112" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Rural Connectivity</text>
+  <text x="1010" y="132" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">/ CSR</text>
+  <text x="1010" y="152" font-size="12" fill="#6B5E49" text-anchor="middle">reach &amp; funding</text>
+</svg>
