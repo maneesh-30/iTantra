@@ -1,0 +1,80 @@
+<svg viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <rect x="0" y="0" width="1200" height="300" fill="#FFFFFF"/>
+
+  <!-- arrows between steps -->
+  <g stroke="#9AA3AF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M223,150 l10,10 l-10,10"/>
+    <path d="M470,150 l10,10 l-10,10"/>
+    <path d="M715,150 l10,10 l-10,10"/>
+    <path d="M960,150 l10,10 l-10,10"/>
+  </g>
+
+  <!-- ===== STEP 1 · Speak (blue) ===== -->
+  <circle cx="120" cy="26" r="18" fill="#3B82F6"/><text x="120" y="32" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+  <rect x="55" y="50" width="130" height="34" rx="17" fill="#DBEAFE"/><text x="120" y="72" font-size="15" font-weight="600" fill="#1E40AF" text-anchor="middle">Speak</text>
+  <!-- man -->
+  <circle cx="52" cy="150" r="20" fill="#2B2B3A"/><circle cx="56" cy="154" r="16" fill="#F2C79E"/>
+  <path d="M26,205 v-16 a26,26 0 0 1 52,0 v16 Z" fill="#2F5FBF"/>
+  <g stroke="#3B82F6" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M74,150 a7,7 0 0 1 0,10"/><path d="M80,146 a12,12 0 0 1 0,18"/></g>
+  <!-- phone -->
+  <rect x="112" y="104" width="66" height="96" rx="11" fill="#1E293B"/><rect x="118" y="112" width="54" height="80" rx="6" fill="#EAF2FF"/>
+  <circle cx="145" cy="142" r="15" fill="#3B82F6"/>
+  <g stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" transform="translate(145,142)"><rect x="-4" y="-7" width="8" height="11" rx="4" fill="#fff" stroke="none"/><path d="M-6,-1 a6,6 0 0 0 12,0"/><line x1="0" y1="5" x2="0" y2="9"/></g>
+  <g fill="#3B82F6"><rect x="130" y="172" width="3" height="7" rx="1.5"/><rect x="138" y="168" width="3" height="15" rx="1.5"/><rect x="146" y="164" width="3" height="23" rx="1.5"/><rect x="154" y="169" width="3" height="13" rx="1.5"/><rect x="162" y="173" width="3" height="5" rx="1.5"/></g>
+  <text x="120" y="252" font-size="14" fill="#4B5563" text-anchor="middle">You speak</text>
+  <text x="120" y="271" font-size="14" fill="#4B5563" text-anchor="middle">into your phone</text>
+
+  <!-- ===== STEP 2 · Speech-to-Text (green) ===== -->
+  <circle cx="360" cy="26" r="18" fill="#22C55E"/><text x="360" y="32" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+  <rect x="285" y="50" width="150" height="34" rx="17" fill="#DCFCE7"/><text x="360" y="72" font-size="15" font-weight="600" fill="#166534" text-anchor="middle">Speech-to-Text</text>
+  <rect x="278" y="106" width="164" height="92" rx="14" fill="#DCFCE7"/>
+  <g fill="#16A34A"><rect x="304" y="148" width="4" height="10" rx="2"/><rect x="313" y="140" width="4" height="26" rx="2"/><rect x="322" y="132" width="4" height="42" rx="2"/><rect x="331" y="142" width="4" height="22" rx="2"/><rect x="340" y="150" width="4" height="6" rx="2"/></g>
+  <path d="M352,153 l10,0 M358,148 l6,5 l-6,5" stroke="#16A34A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="372" y="134" width="40" height="40" rx="5" fill="#fff" stroke="#16A34A" stroke-width="2"/>
+  <g stroke="#16A34A" stroke-width="2.4" stroke-linecap="round"><line x1="380" y1="146" x2="404" y2="146"/><line x1="380" y1="154" x2="404" y2="154"/><line x1="380" y1="162" x2="396" y2="162"/></g>
+  <text x="360" y="252" font-size="14" fill="#4B5563" text-anchor="middle">Your speech is</text>
+  <text x="360" y="271" font-size="14" fill="#4B5563" text-anchor="middle">converted to text</text>
+
+  <!-- ===== STEP 3 · Send text (purple) ===== -->
+  <circle cx="600" cy="26" r="18" fill="#8B5CF6"/><text x="600" y="32" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+  <rect x="510" y="44" width="180" height="46" rx="14" fill="#EDE9FE"/>
+  <text x="600" y="63" font-size="14" font-weight="600" fill="#5B21B6" text-anchor="middle">Send (tiny TEXT)</text>
+  <text x="600" y="81" font-size="14" font-weight="600" fill="#5B21B6" text-anchor="middle">over the link</text>
+  <rect x="512" y="136" width="34" height="40" rx="4" fill="#fff" stroke="#8B5CF6" stroke-width="2"/>
+  <g stroke="#8B5CF6" stroke-width="2.2" stroke-linecap="round"><line x1="519" y1="148" x2="539" y2="148"/><line x1="519" y1="156" x2="539" y2="156"/><line x1="519" y1="164" x2="533" y2="164"/></g>
+  <path d="M566,168 a20,20 0 0 1 4,-39 a16,16 0 0 1 30,2 a15,15 0 0 1 4,37 Z" fill="#F3F0FE" stroke="#8B5CF6" stroke-width="2"/>
+  <circle cx="600" cy="150" r="15" fill="none" stroke="#8B5CF6" stroke-width="2"/>
+  <g stroke="#8B5CF6" stroke-width="1.6" fill="none"><line x1="585" y1="150" x2="615" y2="150"/><ellipse cx="600" cy="150" rx="7" ry="15"/></g>
+  <rect x="654" y="136" width="34" height="40" rx="4" fill="#fff" stroke="#8B5CF6" stroke-width="2"/>
+  <g stroke="#8B5CF6" stroke-width="2.2" stroke-linecap="round"><line x1="661" y1="148" x2="681" y2="148"/><line x1="661" y1="156" x2="681" y2="156"/><line x1="661" y1="164" x2="675" y2="164"/></g>
+  <text x="600" y="252" font-size="14" fill="#4B5563" text-anchor="middle">The small text</text>
+  <text x="600" y="271" font-size="14" fill="#4B5563" text-anchor="middle">is sent over the network</text>
+
+  <!-- ===== STEP 4 · Text-to-Speech (orange) ===== -->
+  <circle cx="840" cy="26" r="18" fill="#F97316"/><text x="840" y="32" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+  <rect x="765" y="50" width="150" height="34" rx="17" fill="#FFEDD5"/><text x="840" y="72" font-size="15" font-weight="600" fill="#9A3412" text-anchor="middle">Text-to-Speech</text>
+  <rect x="758" y="106" width="164" height="92" rx="14" fill="#FFEDD5"/>
+  <rect x="784" y="132" width="40" height="42" rx="5" fill="#fff" stroke="#EA580C" stroke-width="2"/>
+  <g stroke="#EA580C" stroke-width="2.4" stroke-linecap="round"><line x1="792" y1="144" x2="816" y2="144"/><line x1="792" y1="153" x2="816" y2="153"/><line x1="792" y1="162" x2="808" y2="162"/></g>
+  <path d="M832,153 l10,0 M838,148 l6,5 l-6,5" stroke="#EA580C" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M856,146 h8 l10,-8 v26 l-10,-8 h-8 Z" fill="#EA580C"/>
+  <g stroke="#EA580C" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M880,144 a9,9 0 0 1 0,18"/><path d="M886,139 a15,15 0 0 1 0,28"/></g>
+  <text x="840" y="252" font-size="14" fill="#4B5563" text-anchor="middle">The text is converted</text>
+  <text x="840" y="271" font-size="14" fill="#4B5563" text-anchor="middle">back to speech</text>
+
+  <!-- ===== STEP 5 · Voice out (pink) ===== -->
+  <circle cx="1080" cy="26" r="18" fill="#EC4899"/><text x="1080" y="32" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+  <rect x="1015" y="50" width="130" height="34" rx="17" fill="#FCE7F3"/><text x="1080" y="72" font-size="15" font-weight="600" fill="#9D174D" text-anchor="middle">Voice out</text>
+  <!-- phone -->
+  <rect x="1022" y="104" width="66" height="96" rx="11" fill="#1E293B"/><rect x="1028" y="112" width="54" height="80" rx="6" fill="#FCE7F3"/>
+  <path d="M1046,142 h8 l10,-8 v26 l-10,-8 h-8 Z" fill="#EC4899"/>
+  <g stroke="#EC4899" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M1070,140 a9,9 0 0 1 0,18"/></g>
+  <g fill="#EC4899"><rect x="1034" y="172" width="3" height="7" rx="1.5"/><rect x="1042" y="167" width="3" height="16" rx="1.5"/><rect x="1050" y="163" width="3" height="24" rx="1.5"/><rect x="1058" y="168" width="3" height="14" rx="1.5"/><rect x="1066" y="173" width="3" height="6" rx="1.5"/></g>
+  <!-- woman -->
+  <rect x="1120" y="140" width="10" height="42" rx="5" fill="#2B2B3A"/><rect x="1152" y="140" width="10" height="42" rx="5" fill="#2B2B3A"/>
+  <circle cx="1141" cy="150" r="21" fill="#2B2B3A"/><circle cx="1138" cy="154" r="16" fill="#F2C79E"/>
+  <path d="M1114,205 v-16 a27,27 0 0 1 54,0 v16 Z" fill="#E24C87"/>
+  <g stroke="#EC4899" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M1118,150 a7,7 0 0 0 0,10"/><path d="M1112,146 a12,12 0 0 0 0,18"/></g>
+  <text x="1080" y="252" font-size="14" fill="#4B5563" text-anchor="middle">The other person</text>
+  <text x="1080" y="271" font-size="14" fill="#4B5563" text-anchor="middle">hears the voice</text>
+</svg>
