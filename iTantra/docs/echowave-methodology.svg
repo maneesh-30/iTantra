@@ -1,0 +1,90 @@
+<svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <title>EchoWave methodology: on-device voice pipeline and two-phone text-only link.</title>
+  <desc>Top: capture, speech-to-text, tiny text, link, text-to-speech, playback. Bottom: two phones exchanging only text over an offline link.</desc>
+
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#1971C2"/>
+    </marker>
+    <marker id="arg" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#2F9E44"/>
+    </marker>
+  </defs>
+
+  <text x="40" y="42" font-size="17" font-weight="600" fill="#12518F">1 · Voice pipeline — runs on each phone, fully offline</text>
+
+  <g font-size="13">
+    <rect x="40" y="70" width="120" height="78" rx="10" fill="#E7F1FB" stroke="#1971C2"/>
+    <circle cx="58" cy="88" r="10" fill="#1971C2"/><text x="58" y="92" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+    <text x="100" y="112" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">Capture</text>
+    <text x="100" y="132" fill="#5B6B7B" text-anchor="middle">hold to talk</text>
+    <rect x="204" y="70" width="120" height="78" rx="10" fill="#E7F1FB" stroke="#1971C2"/>
+    <circle cx="222" cy="88" r="10" fill="#1971C2"/><text x="222" y="92" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+    <text x="264" y="112" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">STT</text>
+    <text x="264" y="132" fill="#5B6B7B" text-anchor="middle">speech → text</text>
+    <rect x="368" y="70" width="120" height="78" rx="10" fill="#FFF7E6" stroke="#D9A400"/>
+    <circle cx="386" cy="88" r="10" fill="#D9A400"/><text x="386" y="92" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+    <text x="428" y="112" font-size="14" font-weight="600" fill="#8A6600" text-anchor="middle">Text</text>
+    <text x="428" y="132" fill="#8A6600" text-anchor="middle">~80 bytes</text>
+    <rect x="532" y="70" width="120" height="78" rx="10" fill="#E7F1FB" stroke="#1971C2"/>
+    <circle cx="550" cy="88" r="10" fill="#1971C2"/><text x="550" y="92" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+    <text x="592" y="112" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">Link</text>
+    <text x="592" y="132" fill="#5B6B7B" text-anchor="middle">WiFi / LoRa</text>
+    <rect x="696" y="70" width="120" height="78" rx="10" fill="#E7F1FB" stroke="#1971C2"/>
+    <circle cx="714" cy="88" r="10" fill="#1971C2"/><text x="714" y="92" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+    <text x="756" y="112" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">TTS</text>
+    <text x="756" y="132" fill="#5B6B7B" text-anchor="middle">text → speech</text>
+    <rect x="860" y="70" width="120" height="78" rx="10" fill="#E7F6EC" stroke="#2F9E44"/>
+    <circle cx="878" cy="88" r="10" fill="#2F9E44"/><text x="878" y="92" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+    <text x="920" y="112" font-size="14" font-weight="600" fill="#1B6B33" text-anchor="middle">Play</text>
+    <text x="920" y="132" fill="#1B6B33" text-anchor="middle">alert = loud</text>
+  </g>
+
+  <g stroke="#1971C2" stroke-width="2" marker-end="url(#ar)">
+    <line x1="162" y1="109" x2="202" y2="109"/>
+    <line x1="326" y1="109" x2="366" y2="109"/>
+    <line x1="490" y1="109" x2="530" y2="109"/>
+    <line x1="654" y1="109" x2="694" y2="109"/>
+    <line x1="818" y1="109" x2="858" y2="109"/>
+  </g>
+
+  <rect x="300" y="172" width="400" height="34" rx="17" fill="#FFF7E6" stroke="#D9A400"/>
+  <text x="500" y="194" font-size="14" font-weight="600" fill="#8A6600" text-anchor="middle">text ~80 B  vs  audio ~200 KB  ≈  2500× smaller</text>
+
+  <line x1="40" y1="238" x2="960" y2="238" stroke="#D0D7DE" stroke-width="1"/>
+
+  <text x="40" y="278" font-size="17" font-weight="600" fill="#12518F">2 · Two phones — only text crosses the link</text>
+
+  <rect x="70" y="300" width="250" height="300" rx="22" fill="#fff" stroke="#1971C2" stroke-width="2"/>
+  <rect x="86" y="322" width="218" height="256" rx="12" fill="#F2F7FD"/>
+  <text x="195" y="316" font-size="12" fill="#5B6B7B" text-anchor="middle">Phone A · speaker</text>
+  <g font-size="13">
+    <rect x="104" y="338" width="182" height="46" rx="9" fill="#E7F1FB" stroke="#1971C2"/>
+    <text x="195" y="360" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">Speak</text>
+    <text x="195" y="377" fill="#5B6B7B" text-anchor="middle">“भेजो पानी”</text>
+    <rect x="104" y="404" width="182" height="42" rx="9" fill="#E7F1FB" stroke="#1971C2"/>
+    <text x="195" y="430" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">STT: speech → text</text>
+    <rect x="104" y="466" width="182" height="42" rx="9" fill="#FFF7E6" stroke="#D9A400"/>
+    <text x="195" y="492" font-size="14" font-weight="600" fill="#8A6600" text-anchor="middle">text (~80 B)</text>
+  </g>
+
+  <rect x="680" y="300" width="250" height="300" rx="22" fill="#fff" stroke="#2F9E44" stroke-width="2"/>
+  <rect x="696" y="322" width="218" height="256" rx="12" fill="#F1F9F3"/>
+  <text x="805" y="316" font-size="12" fill="#5B6B7B" text-anchor="middle">Phone B · listener</text>
+  <g font-size="13">
+    <rect x="714" y="338" width="182" height="42" rx="9" fill="#FFF7E6" stroke="#D9A400"/>
+    <text x="805" y="364" font-size="14" font-weight="600" fill="#8A6600" text-anchor="middle">text (~80 B)</text>
+    <rect x="714" y="400" width="182" height="42" rx="9" fill="#E7F6EC" stroke="#2F9E44"/>
+    <text x="805" y="426" font-size="14" font-weight="600" fill="#1B6B33" text-anchor="middle">TTS: text → speech</text>
+    <rect x="714" y="462" width="182" height="46" rx="9" fill="#E7F6EC" stroke="#2F9E44"/>
+    <text x="805" y="484" font-size="14" font-weight="600" fill="#1B6B33" text-anchor="middle">Hear voice</text>
+    <text x="805" y="501" fill="#1B6B33" text-anchor="middle">at max volume if alert</text>
+  </g>
+
+  <line x1="322" y1="410" x2="678" y2="410" stroke="#1971C2" stroke-width="2.5" marker-end="url(#ar)"/>
+  <line x1="678" y1="470" x2="322" y2="470" stroke="#2F9E44" stroke-width="2.5" marker-end="url(#arg)"/>
+  <rect x="392" y="424" width="216" height="34" rx="8" fill="#fff" stroke="#C7D3E0"/>
+  <text x="500" y="446" font-size="13" font-weight="600" fill="#12518F" text-anchor="middle">TEXT ONLY · offline</text>
+  <text x="500" y="398" font-size="12" fill="#5B6B7B" text-anchor="middle">A → B</text>
+  <text x="500" y="490" font-size="12" fill="#5B6B7B" text-anchor="middle">B → A (reply)</text>
+</svg>

@@ -1,0 +1,89 @@
+<svg viewBox="0 0 1000 690" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <title>EchoWave methodology with the technology used at each of the seven steps.</title>
+  <desc>Each step tagged with its technology; footer lists the full stack.</desc>
+  <defs>
+    <marker id="b" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#1971C2"/></marker>
+    <marker id="g" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2F9E44"/></marker>
+  </defs>
+
+  <text x="40" y="40" font-size="18" font-weight="600" fill="#12518F">EchoWave — how it works, with the tech at each step</text>
+
+  <rect x="40" y="60" width="300" height="570" rx="16" fill="#F2F7FD" stroke="#1971C2"/>
+  <text x="190" y="88" font-size="15" font-weight="600" fill="#12518F" text-anchor="middle">On the sender's phone</text>
+  <g font-size="13">
+    <rect x="60" y="104" width="260" height="112" rx="10" fill="#fff" stroke="#1971C2"/>
+    <circle cx="80" cy="124" r="11" fill="#1971C2"/><text x="80" y="128" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+    <text x="200" y="130" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">Speak</text>
+    <text x="200" y="150" fill="#5B6B7B" text-anchor="middle">hold Push-to-Talk (mic off idle)</text>
+    <rect x="112" y="180" width="176" height="24" rx="12" fill="#EEF2F6" stroke="#C7D3E0"/>
+    <text x="200" y="196" font-size="11" font-family="monospace" fill="#33475B" text-anchor="middle">AudioRecord · PTT</text>
+
+    <rect x="60" y="248" width="260" height="112" rx="10" fill="#fff" stroke="#1971C2"/>
+    <circle cx="80" cy="268" r="11" fill="#1971C2"/><text x="80" y="272" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+    <text x="200" y="274" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">Detect end of speech</text>
+    <text x="200" y="294" fill="#5B6B7B" text-anchor="middle">pause = sentence finished</text>
+    <rect x="124" y="324" width="152" height="24" rx="12" fill="#EEF2F6" stroke="#C7D3E0"/>
+    <text x="200" y="340" font-size="11" font-family="monospace" fill="#33475B" text-anchor="middle">Silero VAD</text>
+
+    <rect x="60" y="392" width="260" height="112" rx="10" fill="#fff" stroke="#1971C2"/>
+    <circle cx="80" cy="412" r="11" fill="#1971C2"/><text x="80" y="416" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+    <text x="200" y="418" font-size="14" font-weight="600" fill="#12518F" text-anchor="middle">Speech → Text</text>
+    <text x="200" y="438" fill="#5B6B7B" text-anchor="middle">offline STT, whole clip</text>
+    <rect x="74" y="468" width="252" height="24" rx="12" fill="#EEF2F6" stroke="#C7D3E0"/>
+    <text x="200" y="484" font-size="11" font-family="monospace" fill="#33475B" text-anchor="middle">Moonshine / Whisper / AI4Bharat</text>
+  </g>
+  <g stroke="#1971C2" stroke-width="2" marker-end="url(#b)">
+    <line x1="190" y1="216" x2="190" y2="247"/>
+    <line x1="190" y1="360" x2="190" y2="391"/>
+  </g>
+
+  <rect x="370" y="60" width="260" height="570" rx="16" fill="#FFFDF5" stroke="#D9A400"/>
+  <text x="500" y="88" font-size="15" font-weight="600" fill="#8A6600" text-anchor="middle">Across the link</text>
+  <g font-size="13">
+    <rect x="388" y="280" width="224" height="150" rx="10" fill="#fff" stroke="#D9A400"/>
+    <circle cx="408" cy="302" r="11" fill="#D9A400"/><text x="408" y="306" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+    <text x="500" y="310" font-size="14" font-weight="600" fill="#8A6600" text-anchor="middle">Send text</text>
+    <text x="500" y="330" fill="#5B6B7B" text-anchor="middle">broadcast to the channel</text>
+    <text x="500" y="348" font-size="13" font-weight="700" fill="#B0122A" text-anchor="middle">only text — never audio</text>
+    <rect x="404" y="366" width="192" height="24" rx="12" fill="#EEF2F6" stroke="#C7D3E0"/>
+    <text x="500" y="382" font-size="11" font-family="monospace" fill="#33475B" text-anchor="middle">UDP broadcast</text>
+    <rect x="404" y="396" width="192" height="24" rx="12" fill="#EEF2F6" stroke="#C7D3E0"/>
+    <text x="500" y="412" font-size="11" font-family="monospace" fill="#33475B" text-anchor="middle">WiFi / Bluetooth / LoRa</text>
+  </g>
+
+  <rect x="660" y="60" width="300" height="570" rx="16" fill="#F1F9F3" stroke="#2F9E44"/>
+  <text x="810" y="88" font-size="15" font-weight="600" fill="#1B6B33" text-anchor="middle">On the receiver's phone</text>
+  <g font-size="13">
+    <rect x="680" y="104" width="260" height="112" rx="10" fill="#fff" stroke="#2F9E44"/>
+    <circle cx="700" cy="124" r="11" fill="#2F9E44"/><text x="700" y="128" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+    <text x="820" y="130" font-size="14" font-weight="600" fill="#1B6B33" text-anchor="middle">Receive</text>
+    <text x="820" y="150" fill="#5B6B7B" text-anchor="middle">keeps only its channel</text>
+    <rect x="732" y="180" width="176" height="24" rx="12" fill="#EEF2F6" stroke="#C7D3E0"/>
+    <text x="820" y="196" font-size="11" font-family="monospace" fill="#33475B" text-anchor="middle">UDP listener · channel filter</text>
+
+    <rect x="680" y="248" width="260" height="112" rx="10" fill="#fff" stroke="#2F9E44"/>
+    <circle cx="700" cy="268" r="11" fill="#2F9E44"/><text x="700" y="272" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+    <text x="820" y="274" font-size="14" font-weight="600" fill="#1B6B33" text-anchor="middle">Text → Speech</text>
+    <text x="820" y="294" fill="#5B6B7B" text-anchor="middle">read aloud as a voice note</text>
+    <rect x="744" y="324" width="152" height="24" rx="12" fill="#EEF2F6" stroke="#C7D3E0"/>
+    <text x="820" y="340" font-size="11" font-family="monospace" fill="#33475B" text-anchor="middle">VITS / Piper</text>
+
+    <rect x="680" y="392" width="260" height="112" rx="10" fill="#FCEBEB" stroke="#E03131"/>
+    <circle cx="700" cy="412" r="11" fill="#E03131"/><text x="700" y="416" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">7</text>
+    <text x="820" y="418" font-size="14" font-weight="600" fill="#A32D2D" text-anchor="middle">Alert handling</text>
+    <text x="820" y="438" fill="#A32D2D" text-anchor="middle">max volume, no interrupt</text>
+    <rect x="744" y="468" width="152" height="24" rx="12" fill="#FBE0E0" stroke="#E7A3A3"/>
+    <text x="820" y="484" font-size="11" font-family="monospace" fill="#A32D2D" text-anchor="middle">AudioTrack · peak-norm</text>
+  </g>
+  <g stroke="#2F9E44" stroke-width="2" marker-end="url(#g)">
+    <line x1="810" y1="216" x2="810" y2="247"/>
+    <line x1="810" y1="360" x2="810" y2="391"/>
+  </g>
+
+  <line x1="340" y1="330" x2="386" y2="330" stroke="#1971C2" stroke-width="2.5" marker-end="url(#b)"/>
+  <line x1="614" y1="330" x2="658" y2="330" stroke="#2F9E44" stroke-width="2.5" marker-end="url(#g)"/>
+
+  <rect x="40" y="644" width="920" height="34" rx="8" fill="#EEF2F6" stroke="#C7D3E0"/>
+  <text x="60" y="666" font-size="13" font-weight="600" fill="#12518F">Stack:</text>
+  <text x="112" y="666" font-size="12" font-family="monospace" fill="#33475B">Kotlin · Android · sherpa-onnx · ONNX Runtime · Whisper/Moonshine · Silero VAD · VITS/Piper · UDP broadcast</text>
+</svg>

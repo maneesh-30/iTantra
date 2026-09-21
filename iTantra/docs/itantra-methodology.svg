@@ -1,0 +1,57 @@
+<svg viewBox="0 0 1160 230" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <rect x="0" y="0" width="1160" height="230" fill="#FFFFFF"/>
+  <defs>
+    <marker id="am" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#E8A317"/></marker>
+  </defs>
+
+  <text x="16" y="28" font-size="17" font-weight="700" fill="#2A2118">iTantra — on-device pipeline (fully offline, open-source)</text>
+
+  <!-- boxes -->
+  <g>
+    <rect x="10" y="52" width="170" height="112" rx="12" fill="#FFFDF9" stroke="#E8A317" stroke-width="1.5"/>
+    <circle cx="30" cy="72" r="11" fill="#E8A317"/><text x="30" y="76" font-size="12" font-weight="700" fill="#241A05" text-anchor="middle">1</text>
+    <text x="95" y="98" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Capture</text>
+    <text x="95" y="120" font-size="12" fill="#6B5E49" text-anchor="middle">push-to-talk /</text>
+    <text x="95" y="137" font-size="12" fill="#6B5E49" text-anchor="middle">pause detect (VAD)</text>
+
+    <rect x="208" y="52" width="170" height="112" rx="12" fill="#FFFDF9" stroke="#E8A317" stroke-width="1.5"/>
+    <circle cx="228" cy="72" r="11" fill="#E8A317"/><text x="228" y="76" font-size="12" font-weight="700" fill="#241A05" text-anchor="middle">2</text>
+    <text x="293" y="98" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Speech → Text</text>
+    <text x="293" y="120" font-size="12" fill="#6B5E49" text-anchor="middle">Moonshine (En),</text>
+    <text x="293" y="137" font-size="12" fill="#6B5E49" text-anchor="middle">IndicConformer</text>
+
+    <rect x="406" y="52" width="170" height="112" rx="12" fill="#E8A317"/>
+    <circle cx="426" cy="72" r="11" fill="#241A05"/><text x="426" y="76" font-size="12" font-weight="700" fill="#E8A317" text-anchor="middle">3</text>
+    <text x="491" y="98" font-size="15" font-weight="700" fill="#241A05" text-anchor="middle">Text</text>
+    <text x="491" y="122" font-size="13" font-weight="600" fill="#241A05" text-anchor="middle">≈ 80 bytes</text>
+    <text x="491" y="140" font-size="11" fill="#5A430F" text-anchor="middle">(vs ~200 KB audio)</text>
+
+    <rect x="604" y="52" width="170" height="112" rx="12" fill="#FFFDF9" stroke="#E8A317" stroke-width="1.5"/>
+    <circle cx="624" cy="72" r="11" fill="#E8A317"/><text x="624" y="76" font-size="12" font-weight="700" fill="#241A05" text-anchor="middle">4</text>
+    <text x="689" y="98" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Send</text>
+    <text x="689" y="120" font-size="12" fill="#6B5E49" text-anchor="middle">local WiFi / Bluetooth</text>
+    <text x="689" y="137" font-size="12" fill="#6B5E49" text-anchor="middle">(no internet)</text>
+
+    <rect x="802" y="52" width="170" height="112" rx="12" fill="#FFFDF9" stroke="#E8A317" stroke-width="1.5"/>
+    <circle cx="822" cy="72" r="11" fill="#E8A317"/><text x="822" y="76" font-size="12" font-weight="700" fill="#241A05" text-anchor="middle">5</text>
+    <text x="887" y="98" font-size="15" font-weight="700" fill="#2A2118" text-anchor="middle">Text → Speech</text>
+    <text x="887" y="120" font-size="12" fill="#6B5E49" text-anchor="middle">Piper / VITS</text>
+    <text x="887" y="137" font-size="12" fill="#6B5E49" text-anchor="middle">voices</text>
+
+    <rect x="1000" y="52" width="150" height="112" rx="12" fill="#DDF3EF" stroke="#158D7C" stroke-width="1.5"/>
+    <circle cx="1020" cy="72" r="11" fill="#158D7C"/><text x="1020" y="76" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+    <text x="1075" y="98" font-size="15" font-weight="700" fill="#0F5A4E" text-anchor="middle">Play</text>
+    <text x="1075" y="120" font-size="12" fill="#3E7A70" text-anchor="middle">voice note;</text>
+    <text x="1075" y="137" font-size="12" fill="#3E7A70" text-anchor="middle">alerts loudest</text>
+  </g>
+
+  <g stroke="#E8A317" stroke-width="2.5" marker-end="url(#am)">
+    <line x1="182" y1="108" x2="206" y2="108"/>
+    <line x1="380" y1="108" x2="404" y2="108"/>
+    <line x1="578" y1="108" x2="602" y2="108"/>
+    <line x1="776" y1="108" x2="800" y2="108"/>
+    <line x1="974" y1="108" x2="998" y2="108"/>
+  </g>
+
+  <text x="16" y="208" font-size="13" fill="#6B5E49">Runs on low/mid-range Android · Kotlin · sherpa-onnx + ONNX Runtime · Silero VAD · all open-source, fully offline</text>
+</svg>
