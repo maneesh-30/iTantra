@@ -1,0 +1,32 @@
+<svg viewBox="0 0 640 420" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <rect x="0" y="0" width="640" height="420" fill="#FFFFFF"/>
+
+  <rect x="16" y="16" width="608" height="186" rx="16" fill="#FFF6E4"/>
+  <rect x="40" y="60" width="120" height="100" rx="14" fill="#241A05"/>
+  <circle cx="100" cy="98" r="20" fill="#E8A317"/>
+  <g stroke="#241A05" stroke-width="2.2" fill="none" stroke-linecap="round" transform="translate(100,98)"><rect x="-4" y="-8" width="8" height="12" rx="4" fill="#241A05" stroke="none"/><path d="M-7,-1 a7,7 0 0 0 14,0"/><line x1="0" y1="6" x2="0" y2="10"/></g>
+  <g fill="#E8A317"><rect x="86" y="128" width="4" height="8" rx="2"/><rect x="96" y="123" width="4" height="18" rx="2"/><rect x="106" y="128" width="4" height="8" rx="2"/></g>
+  <circle cx="210" cy="88" r="24" fill="#33291C"/><circle cx="210" cy="93" r="21" fill="#E8B48C"/>
+  <path d="M182,160 v-26 a28,28 0 0 1 56,0 v26 Z" fill="#C97A2C"/>
+  <rect x="196" y="96" width="12" height="26" rx="3" fill="#241A05" transform="rotate(-14,202,109)"/>
+  <rect x="200" y="30" width="184" height="30" rx="15" fill="#E8A317"/>
+  <text x="292" y="50" font-size="14" font-weight="700" fill="#241A05" text-anchor="middle">Walkie-talkie mode</text>
+  <text x="270" y="96" font-size="17" font-weight="700" fill="#2A2118">Hold to talk, release to listen.</text>
+  <text x="270" y="122" font-size="13" fill="#6B5E49">One-to-many on a shared channel — like a radio.</text>
+  <text x="270" y="150" font-size="13" fill="#6B5E49">Mic stays off when idle, saving battery.</text>
+
+  <rect x="16" y="218" width="608" height="186" rx="16" fill="#EAF7F4"/>
+  <rect x="40" y="262" width="120" height="100" rx="14" fill="#241A05"/>
+  <circle cx="100" cy="296" r="16" fill="#158D7C"/>
+  <g fill="#fff" transform="translate(100,296)"><circle cx="0" cy="-4" r="5"/><path d="M-8,8 q8,-10 16,0 Z"/></g>
+  <text x="100" y="330" font-size="9" fill="#DDF3EF" text-anchor="middle">00:12</text>
+  <rect x="196" y="292" width="12" height="46" rx="6" fill="#33291C"/><rect x="236" y="292" width="12" height="46" rx="6" fill="#33291C"/>
+  <circle cx="222" cy="290" r="25" fill="#33291C"/><circle cx="222" cy="296" r="21" fill="#E8B48C"/>
+  <path d="M194,362 v-24 a28,28 0 0 1 56,0 v24 Z" fill="#1F9E8B"/>
+  <rect x="240" y="278" width="12" height="30" rx="3" fill="#241A05" transform="rotate(12,246,293)"/>
+  <rect x="200" y="232" width="150" height="30" rx="15" fill="#158D7C"/>
+  <text x="275" y="252" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">Phone mode</text>
+  <text x="270" y="298" font-size="17" font-weight="700" fill="#2A2118">Talk hands-free, like a normal call.</text>
+  <text x="270" y="324" font-size="13" fill="#5A6B66">Continuous — no button; auto-detects pauses.</text>
+  <text x="270" y="352" font-size="13" fill="#5A6B66">Alerts play at maximum volume, non-stop.</text>
+</svg>
