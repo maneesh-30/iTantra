@@ -1,0 +1,36 @@
+<svg viewBox="0 0 700 980" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <rect x="0" y="0" width="700" height="980" fill="#FFFDF9"/>
+  <defs><marker id="dn" markerWidth="12" markerHeight="12" refX="6" refY="9" orient="auto"><path d="M1,1 L6,9 L11,1" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+  <text x="350" y="52" font-size="30" font-weight="700" fill="#0F2247" text-anchor="middle">Prototype → Production</text>
+
+  <!-- Prototype -->
+  <path d="M60,148 L60,106 Q60,90 76,90 L624,90 Q640,90 640,106 L640,148 Z" fill="#DBEAFE"/>
+  <path d="M60,148 L60,284 Q60,300 76,300 L624,300 Q640,300 640,284 L640,148 Z" fill="#EFF5FF"/>
+  <text x="88" y="132" font-size="26" font-weight="700" fill="#0F2247">Prototype</text>
+  <circle cx="98" cy="182" r="5" fill="#3B82F6"/><text x="120" y="188" font-size="19" fill="#1F2A44">English + Hindi</text>
+  <circle cx="98" cy="222" r="5" fill="#3B82F6"/><text x="120" y="228" font-size="19" fill="#1F2A44">Offline two-phone loop</text>
+  <circle cx="98" cy="262" r="5" fill="#3B82F6"/><text x="120" y="268" font-size="19" fill="#1F2A44">Walkie-talkie + alerts</text>
+
+  <line x1="350" y1="312" x2="350" y2="342" stroke="#64748B" stroke-width="2" marker-end="url(#dn)"/>
+
+  <!-- Pilot -->
+  <path d="M60,414 L60,372 Q60,356 76,356 L624,356 Q640,356 640,372 L640,414 Z" fill="#DCFCE7"/>
+  <path d="M60,414 L60,594 Q60,610 76,610 L624,610 Q640,610 640,594 L640,414 Z" fill="#F0FBF4"/>
+  <text x="88" y="398" font-size="26" font-weight="700" fill="#0F2247">Pilot</text>
+  <circle cx="98" cy="450" r="5" fill="#22C55E"/><text x="120" y="456" font-size="19" fill="#1F2A44">One rescue / patrol team</text>
+  <circle cx="98" cy="490" r="5" fill="#22C55E"/><text x="120" y="496" font-size="19" fill="#1F2A44">3–4 languages</text>
+  <circle cx="98" cy="534" r="5" fill="#22C55E"/><text x="120" y="540" font-size="19" fill="#1F2A44">Measure accuracy &amp; latency</text>
+  <text x="120" y="566" font-size="19" fill="#1F2A44">in the field</text>
+
+  <line x1="350" y1="622" x2="350" y2="652" stroke="#64748B" stroke-width="2" marker-end="url(#dn)"/>
+
+  <!-- Production -->
+  <path d="M60,724 L60,682 Q60,666 76,666 L624,666 Q640,666 640,682 L640,724 Z" fill="#EDE9FE"/>
+  <path d="M60,724 L60,924 Q60,940 76,940 L624,940 Q640,940 640,924 L640,724 Z" fill="#F5F3FE"/>
+  <text x="88" y="708" font-size="26" font-weight="700" fill="#0F2247">Production</text>
+  <circle cx="98" cy="760" r="5" fill="#8B5CF6"/><text x="120" y="766" font-size="19" fill="#1F2A44">All 10 languages</text>
+  <circle cx="98" cy="800" r="5" fill="#8B5CF6"/><text x="120" y="806" font-size="19" fill="#1F2A44">Hands-free phone mode</text>
+  <circle cx="98" cy="840" r="5" fill="#8B5CF6"/><text x="120" y="846" font-size="19" fill="#1F2A44">Bluetooth</text>
+  <circle cx="98" cy="880" r="5" fill="#8B5CF6"/><text x="120" y="886" font-size="19" fill="#1F2A44">Download-on-demand</text>
+</svg>

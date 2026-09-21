@@ -1,0 +1,32 @@
+<svg viewBox="0 0 1120 190" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <rect x="0" y="0" width="1120" height="190" fill="#FFFFFF"/>
+  <defs><marker id="rm" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#B08D4B"/></marker></defs>
+
+  <text x="16" y="28" font-size="17" font-weight="700" fill="#2A2118">From prototype to production</text>
+
+  <!-- Now -->
+  <rect x="14" y="46" width="330" height="120" rx="14" fill="#FDECCB" stroke="#E8A317"/>
+  <text x="34" y="78" font-size="16" font-weight="700" fill="#7A4E0C">NOW · Prototype</text>
+  <text x="34" y="104" font-size="13" fill="#3A2E1A">• English + Hindi, fully offline</text>
+  <text x="34" y="124" font-size="13" fill="#3A2E1A">• Two-phone loop over WiFi</text>
+  <text x="34" y="144" font-size="13" fill="#3A2E1A">• Walkie-talkie + priority alerts</text>
+
+  <!-- Pilot -->
+  <rect x="395" y="46" width="330" height="120" rx="14" fill="#F6C560" stroke="#D9930E"/>
+  <text x="415" y="78" font-size="16" font-weight="700" fill="#6B3F06">PILOT</text>
+  <text x="415" y="104" font-size="13" fill="#3A2E1A">• One rescue / patrol team</text>
+  <text x="415" y="124" font-size="13" fill="#3A2E1A">• 3–4 languages in the field</text>
+  <text x="415" y="144" font-size="13" fill="#3A2E1A">• Measure accuracy &amp; latency</text>
+
+  <!-- Production -->
+  <rect x="776" y="46" width="330" height="120" rx="14" fill="#E8A317" stroke="#B06A0F"/>
+  <text x="796" y="78" font-size="16" font-weight="700" fill="#241A05">PRODUCTION</text>
+  <text x="796" y="104" font-size="13" fill="#241A05">• All 10 languages</text>
+  <text x="796" y="124" font-size="13" fill="#241A05">• Phone mode (VAD) + Bluetooth</text>
+  <text x="796" y="144" font-size="13" fill="#241A05">• Download-on-demand packs</text>
+
+  <g stroke="#B08D4B" stroke-width="3" marker-end="url(#rm)">
+    <line x1="348" y1="106" x2="392" y2="106"/>
+    <line x1="729" y1="106" x2="773" y2="106"/>
+  </g>
+</svg>

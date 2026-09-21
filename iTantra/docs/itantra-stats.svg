@@ -1,0 +1,24 @@
+<svg viewBox="0 0 1120 170" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, Segoe UI, Roboto, sans-serif">
+  <rect x="0" y="0" width="1120" height="170" fill="#FFFFFF"/>
+  <g>
+    <rect x="10" y="18" width="260" height="134" rx="14" fill="#FFF6E4" stroke="#E8A317"/>
+    <text x="140" y="78" font-size="34" font-weight="700" fill="#B06A0F" text-anchor="middle">30–50%</text>
+    <text x="140" y="106" font-size="13" fill="#4B5563" text-anchor="middle">telecom capacity lost for</text>
+    <text x="140" y="124" font-size="13" fill="#4B5563" text-anchor="middle">days in major disasters</text>
+
+    <rect x="290" y="18" width="260" height="134" rx="14" fill="#FFF6E4" stroke="#E8A317"/>
+    <text x="420" y="78" font-size="34" font-weight="700" fill="#B06A0F" text-anchor="middle">~314M</text>
+    <text x="420" y="106" font-size="13" fill="#4B5563" text-anchor="middle">Indians cannot</text>
+    <text x="420" y="124" font-size="13" fill="#4B5563" text-anchor="middle">read or write</text>
+
+    <rect x="570" y="18" width="260" height="134" rx="14" fill="#FFF6E4" stroke="#E8A317"/>
+    <text x="700" y="78" font-size="34" font-weight="700" fill="#B06A0F" text-anchor="middle">96.71%</text>
+    <text x="700" y="106" font-size="13" fill="#4B5563" text-anchor="middle">covered by India's</text>
+    <text x="700" y="124" font-size="13" fill="#4B5563" text-anchor="middle">22 official languages</text>
+
+    <rect x="850" y="18" width="260" height="134" rx="14" fill="#E8A317"/>
+    <text x="980" y="78" font-size="34" font-weight="700" fill="#241A05" text-anchor="middle">~2500×</text>
+    <text x="980" y="106" font-size="13" fill="#5A430F" text-anchor="middle">less data than sending</text>
+    <text x="980" y="124" font-size="13" fill="#5A430F" text-anchor="middle">audio (text vs voice)</text>
+  </g>
+</svg>
