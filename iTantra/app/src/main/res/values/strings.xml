@@ -1,3 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">iTantra</string>
+
+    <!-- Join screen -->
+    <string name="join_tagline">Talk to your team over WiFi or a hotspot. No internet needed.</string>
+    <string name="name_label">Your name</string>
+    <string name="name_placeholder">e.g. Asha Verma</string>
+    <string name="name_helper">Shown next to your messages</string>
+    <string name="name_error">Enter your name so others know who is talking</string>
+    <string name="channel_label">Channel</string>
+    <string name="channel_placeholder">e.g. RESCUE-1</string>
+    <string name="channel_helper">Phones on the same channel hear each other</string>
+    <string name="channel_error">Enter a channel name</string>
+    <string name="language_label">Language you speak</string>
+    <string name="lang_loading">Preparing %1$s speech…</string>
+    <string name="lang_ready">%1$s speech is ready</string>
+    <string name="lang_failed">Couldn\'t load %1$s speech. Reinstall the app with its models.</string>
+    <string name="net_ok_title">Connected to a local network</string>
+    <string name="net_ok_body">Phones on the same WiFi or hotspot can hear you</string>
+    <string name="net_none_title">Not on WiFi</string>
+    <string name="net_none_body">Turn on WiFi or connect to someone\'s hotspot. Internet isn\'t needed.</string>
+    <string name="join_button">Join channel</string>
+    <string name="check_accuracy">Test speech accuracy</string>
+    <string name="mic_permission_needed">Allow microphone access to talk. You can still listen.</string>
+
+    <!-- Talk screen -->
+    <string name="leave">Leave channel</string>
+    <string name="settings">Settings</string>
+    <string name="only_you">Just you so far</string>
+    <plurals name="you_and_others">
+        <item quantity="one">You and %d other</item>
+        <item quantity="other">You and %d others</item>
+    </plurals>
+    <string name="tab_messages">Messages</string>
+    <string name="tab_people">People</string>
+    <string name="tab_people_count">People (%1$d)</string>
+    <string name="empty_title">No messages yet</string>
+    <string name="empty_body">Hold the blue button and speak. Everyone on %1$s will hear you.</string>
+    <string name="net_banner">No WiFi. Your messages can\'t reach anyone until you connect to WiFi or a hotspot.</string>
+
+    <string name="hint_hold">Hold to talk</string>
+    <string name="hint_hold_alert">Hold to send an alert</string>
+    <string name="hint_loading">Getting speech ready…</string>
+    <string name="hint_listening">Listening %1$s</string>
+    <string name="hint_slide_cancel">Slide left to cancel</string>
+    <string name="hint_release_cancel">Release to cancel</string>
+    <string name="hint_transcribing">Turning speech into text…</string>
+    <string name="hint_too_short">Keep holding the button while you speak</string>
+    <string name="hint_not_heard">Didn\'t catch that. Try again, a little closer to the mic.</string>
+    <string name="hint_cancelled">Cancelled</string>
+    <string name="hint_limit">Stopped at 30 seconds and sent</string>
+    <string name="hint_alert_sub">Your next message goes out as an alert</string>
+
+    <string name="talk_button_desc">Hold to talk</string>
+    <string name="alert_toggle_desc">Send next message as an alert</string>
+    <string name="type_message">Type a message</string>
+    <string name="send">Send</string>
+    <string name="switch_to_keyboard">Type instead</string>
+    <string name="switch_to_mic">Talk instead</string>
+
+    <string name="status_sent">Sent</string>
+    <string name="status_heard_one">Heard by %1$s</string>
+    <string name="status_heard_many">Heard by %1$d people</string>
+    <string name="tag_alert">Alert</string>
+    <string name="you_named">%1$s (you)</string>
+    <string name="this_phone">This phone</string>
+    <string name="online">Online</string>
+    <string name="system_joined_you">You joined %1$s</string>
+    <string name="system_joined">%1$s joined</string>
+    <string name="system_here">%1$s is here</string>
+    <string name="system_left">%1$s left</string>
+    <string name="replay_desc">Tap to hear it again</string>
+    <string name="copied">Message copied</string>
+    <string name="alert_from">Alert from %1$s</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="radar_waiting">Waiting for others to join…</string>
+    <string name="you">You</string>
+
+    <string name="leave_title">Leave %1$s?</string>
+    <string name="leave_body">You\'ll stop hearing messages on this channel.</string>
+    <string name="leave_confirm">Leave</string>
+    <string name="stay">Stay</string>
+
+    <!-- Settings -->
+    <string name="read_aloud">Read messages aloud</string>
+    <string name="read_aloud_sub">Alerts are always read aloud</string>
+    <string name="voice_speed">Voice speed</string>
+    <string name="speed_value">%1$.1f×</string>
+    <string name="speak_language_sub">Messages from others are read in their own language</string>
+    <string name="settings_note">Messages travel as text over your local network. Nothing is sent to the internet.</string>
+
+    <!-- Speech accuracy test -->
+    <string name="bench_title">Speech accuracy test</string>
+    <string name="bench_progress">Sentence %1$d of %2$d</string>
+    <string name="bench_read_this">Read this sentence aloud</string>
+    <string name="bench_heard">What the app heard</string>
+    <string name="bench_nothing_yet">Hold the button and read the sentence.</string>
+    <string name="bench_nothing_heard">Nothing recognised. Try again.</string>
+    <string name="bench_hold">Hold to read</string>
+    <string name="bench_scoring">Scoring…</string>
+    <string name="bench_next">Next sentence</string>
+    <string name="bench_finish">See results</string>
+    <string name="bench_metric_wer">Word errors</string>
+    <string name="bench_metric_rtf">Real-time factor</string>
+    <string name="bench_metric_time">Recognition</string>
+    <string name="bench_overall">So far: %1$.1f%% word errors, real-time factor %2$.2f</string>
+    <string name="bench_done">Test complete</string>
+    <string name="result_title">Accuracy result</string>
+    <string name="result_sub">%1$s, %2$d sentences</string>
+    <string name="result_wer_label">Word error rate</string>
+    <string name="result_rtf_label">Real-time factor</string>
+    <string name="result_rtf_hint">Below 1.0 means it transcribes faster than you speak</string>
+    <string name="result_foot_en">On-device and offline, using Moonshine</string>
+    <string name="result_foot_hi">On-device and offline, using AI4Bharat IndicConformer</string>
+    <string name="done">Done</string>
+    <string name="back">Back</string>
 </resources>

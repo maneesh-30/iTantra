@@ -1,0 +1,11 @@
+<!-- The iTantra mark (a waveform whose third bar is an "i") on a signal-blue tile. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="56dp" android:height="56dp"
+    android:viewportWidth="48" android:viewportHeight="48">
+    <path android:fillColor="@color/brand"
+        android:pathData="M14,0h20a14,14 0 0 1 14,14v20a14,14 0 0 1 -14,14h-20a14,14 0 0 1 -14,-14v-20a14,14 0 0 1 14,-14z" />
+    <path android:strokeColor="@android:color/white" android:strokeWidth="3.5" android:strokeLineCap="round"
+        android:pathData="M12,24.3L12,27.5M17.9,20.8L17.9,31M23.1,21.7L23.1,31M30.2,19L30.2,33M36,24.3L36,27.5" />
+    <path android:fillColor="@android:color/white"
+        android:pathData="M21.35,15.1a1.75,1.75 0 1,0 3.5,0a1.75,1.75 0 1,0 -3.5,0z" />
+</vector>

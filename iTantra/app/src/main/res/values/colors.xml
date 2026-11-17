@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Surfaces -->
+    <color name="bg">#F3F5FA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_alt">#EDF0F6</color>
+    <color name="line">#E1E6EF</color>
+    <color name="outline">#C3CAD8</color>
 
-    <!-- iTantra soft-blue light theme. -->
-    <color name="bg">#F3F5F9</color>            <!-- page background -->
-    <color name="card">#FFFFFFFF</color>        <!-- header / cards / inputs -->
-    <color name="card_border">#E6E9F0</color>
-    <color name="surface2">#E7EAF0</color>       <!-- other-person bubble, chips, pills -->
+    <!-- Text -->
+    <color name="ink">#13203A</color>
+    <color name="ink_soft">#3A4660</color>
+    <color name="muted">#5E6A82</color>
+    <color name="disabled">#C9D0DD</color>
 
-    <color name="amber">#3B6FE0</color>          <!-- primary accent (blue) -->
-    <color name="amber_dark">#2F5BC0</color>     <!-- pressed -->
-    <color name="on_amber">#FFFFFF</color>       <!-- text on the accent -->
-    <color name="name_accent">#3B6FE0</color>    <!-- sender names -->
+    <!-- Brand: signal blue (white text on it passes WCAG AA) -->
+    <color name="brand">#2F62E0</color>
+    <color name="brand_deep">#2450C2</color>
+    <color name="brand_tint">#E4ECFD</color>
+    <color name="on_brand">#FFFFFF</color>
 
-    <color name="own_bubble">#D8E4FB</color>     <!-- your own message bubble (soft blue) -->
-    <color name="own_ink">#1E2B4D</color>        <!-- text inside your own bubble -->
+    <!-- Alerts -->
+    <color name="alert">#D92D20</color>
+    <color name="alert_deep">#B42318</color>
+    <color name="alert_tint">#FDECEA</color>
+    <color name="alert_ink">#912018</color>
 
-    <color name="ink">#1A1D21</color>            <!-- primary text -->
-    <color name="muted">#8A93A3</color>          <!-- secondary text -->
+    <!-- Live / heard -->
+    <color name="live">#16A34A</color>
+    <color name="live_tint">#E6F6EC</color>
 
-    <color name="success">#2F9E44</color>        <!-- online / on air -->
-    <color name="danger">#E03131</color>         <!-- alerts -->
-    <color name="danger_tint">#FCE8E8</color>    <!-- alert bubble bg -->
-    <color name="danger_text">#A32D2D</color>
-
-    <!-- legacy names kept so older drawable refs still resolve -->
-    <color name="brand">#3B6FE0</color>
-    <color name="brand_dark">#2F5BC0</color>
-    <color name="brand_tint">#E7EAF0</color>
-    <color name="field_bg">#F3F5F9</color>
-    <color name="danger_dark">#A32D2D</color>
+    <!-- Warnings (no network) -->
+    <color name="warn_tint">#FFF4E0</color>
+    <color name="warn_ink">#7A4A00</color>
 </resources>

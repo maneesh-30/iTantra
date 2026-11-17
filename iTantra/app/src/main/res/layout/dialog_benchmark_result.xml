@@ -2,78 +2,98 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:background="@drawable/card_mission"
-    android:padding="24dp"
-    android:gravity="center_horizontal">
+    android:paddingStart="24dp"
+    android:paddingTop="28dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="8dp">
 
     <TextView
+        style="@style/Text.ITantra.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Benchmark Results"
-        android:textColor="@color/amber"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:text="@string/result_title"
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/tvDlgSub"
+        style="@style/Text.ITantra.Meta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="English · 10 sentences"
-        android:textColor="@color/muted"
-        android:textSize="13sp"
-        android:paddingTop="2dp"
-        android:paddingBottom="18dp" />
+        android:layout_marginTop="4dp"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvDlgWer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/brand"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/Text.ITantra.Meta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/result_wer_label"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvDlgRtf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/brand"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/Text.ITantra.Meta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/result_rtf_label"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/tvDlgWer"
-        android:layout_width="wrap_content"
+        style="@style/Text.ITantra.Meta"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="0.0%"
-        android:textColor="@color/amber"
-        android:textSize="46sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Word Error Rate (lower is better)"
-        android:textColor="@color/ink"
-        android:textSize="13sp"
-        android:paddingBottom="18dp" />
-
-    <TextView
-        android:id="@+id/tvDlgRtf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0.00"
-        android:textColor="@color/amber"
-        android:textSize="46sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Avg Real-Time Factor (&lt; 1 = faster than real time)"
-        android:textColor="@color/ink"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="@string/result_rtf_hint"
         android:textSize="13sp" />
 
     <TextView
         android:id="@+id/tvDlgFoot"
+        style="@style/Text.ITantra.Meta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:gravity="center"
-        android:text="On-device · offline · IndicConformer int8"
-        android:textColor="@color/muted"
-        android:textSize="12sp"
-        android:paddingTop="16dp" />
-
-    <Button
-        android:id="@+id/btnDlgClose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:text="Close"
-        android:textColor="@color/on_amber"
-        android:backgroundTint="@color/amber" />
+        android:textSize="13sp" />
 </LinearLayout>

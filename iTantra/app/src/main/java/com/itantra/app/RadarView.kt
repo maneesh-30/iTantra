@@ -10,130 +10,117 @@ import android.graphics.SweepGradient
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
+import androidx.core.content.ContextCompat
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
 /**
- * RadarView — a view-only "who's in the room" radar.
+ * RadarView — a view-only "who's on the channel" radar.
  *
- * Draws concentric rings with "You" at the centre and everyone we've heard from placed as
- * blips around the ring. It does not handle any input; the Talk screen is where you speak.
- * Call [setPeople] with the list of other people's names to update it.
+ * "You" sit at the centre; everyone else is a blip with their initials, spread around the
+ * ring. The sweep only animates while the view is on screen, to save battery.
  */
 class RadarView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyle: Int = 0
+    context: Context, attrs: AttributeSet? = null, defStyle: Int = 0,
 ) : View(context, attrs, defStyle) {
 
-    private val amber = Color.parseColor("#3B6FE0")
-    private val onAmber = Color.parseColor("#FFFFFF")
-    private val blip = Color.parseColor("#3B6FE0")
-    private val ring = Color.parseColor("#D6DEEA")
-    private val ring2 = Color.parseColor("#E6E9F0")
-    private val ink = Color.parseColor("#1A1D21")
-    private val muted = Color.parseColor("#8A93A3")
+    private val brand = ContextCompat.getColor(context, R.color.brand)
+    private val ring = ContextCompat.getColor(context, R.color.line)
+    private val ink = ContextCompat.getColor(context, R.color.ink)
+    private val muted = ContextCompat.getColor(context, R.color.muted)
 
     private val d = resources.displayMetrics.density
     private fun dp(v: Float) = v * d
 
-    private var people: List<String> = emptyList()
+    private var people: List<Peer> = emptyList()
 
-    fun setPeople(names: List<String>) {
-        people = names
+    fun setPeople(list: List<Peer>) {
+        people = list
+        contentDescription = if (list.isEmpty()) context.getString(R.string.radar_waiting)
+        else list.joinToString { it.name }
         invalidate()
     }
 
-    private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = dp(1f)
-    }
-    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textAlign = Paint.Align.CENTER
-    }
-
-    // Rotating radar sweep.
-    private val sweepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-    private val sweepLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = dp(2f)
-        color = amber
-    }
-    private var sweepAngle = 0f
+    private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = dp(1.2f) }
+    private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
+    private val sweepPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val sweepLine = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeWidth = dp(2f); color = brand }
+    private val matrix = Matrix()
+    private var shader: SweepGradient? = null
+    private var sweep = 0f
     private var animator: ValueAnimator? = null
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        animator = ValueAnimator.ofFloat(0f, 360f).apply {
-            duration = 3500
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = LinearInterpolator()
-            addUpdateListener { sweepAngle = it.animatedValue as Float; postInvalidateOnAnimation() }
-            start()
-        }
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        val trail = Color.argb(60, Color.red(brand), Color.green(brand), Color.blue(brand))
+        shader = SweepGradient(w / 2f, h / 2f, intArrayOf(Color.TRANSPARENT, trail), null)
+        sweepPaint.shader = shader
     }
 
-    override fun onDetachedFromWindow() {
-        animator?.cancel()
-        animator = null
-        super.onDetachedFromWindow()
+    override fun onVisibilityAggregated(isVisible: Boolean) {
+        super.onVisibilityAggregated(isVisible)
+        if (isVisible && animator == null) {
+            animator = ValueAnimator.ofFloat(0f, 360f).apply {
+                duration = 3600
+                repeatCount = ValueAnimator.INFINITE
+                interpolator = LinearInterpolator()
+                addUpdateListener { sweep = it.animatedValue as Float; invalidate() }
+                start()
+            }
+        } else if (!isVisible) {
+            animator?.cancel()
+            animator = null
+        }
     }
 
     override fun onDraw(canvas: Canvas) {
         val cx = width / 2f
         val cy = height / 2f
-        val maxR = min(width, height) / 2f - dp(28f)
+        val maxR = min(width, height) / 2f - dp(30f)
 
-        // rings
-        ringPaint.color = ring2
-        canvas.drawCircle(cx, cy, maxR, ringPaint)
         ringPaint.color = ring
-        canvas.drawCircle(cx, cy, maxR * 0.62f, ringPaint)
-        canvas.drawCircle(cx, cy, maxR * 0.32f, ringPaint)
+        for (f in floatArrayOf(1f, 0.66f, 0.33f)) canvas.drawCircle(cx, cy, maxR * f, ringPaint)
 
-        // rotating sweep: a fading tail (SweepGradient) plus a crisp leading line
-        val trail = Color.argb(70, Color.red(amber), Color.green(amber), Color.blue(amber))
-        val shader = SweepGradient(cx, cy, intArrayOf(Color.TRANSPARENT, trail), null)
-        val m = Matrix().apply { setRotate(sweepAngle, cx, cy) }
-        shader.setLocalMatrix(m)
-        sweepPaint.shader = shader
-        canvas.drawCircle(cx, cy, maxR, sweepPaint)
-        val rad = (sweepAngle - 90.0) * PI / 180.0
-        canvas.drawLine(
-            cx, cy,
-            cx + (maxR * cos(rad)).toFloat(), cy + (maxR * sin(rad)).toFloat(),
-            sweepLinePaint
-        )
+        shader?.let {
+            matrix.setRotate(sweep, cx, cy)
+            it.setLocalMatrix(matrix)
+            canvas.drawCircle(cx, cy, maxR, sweepPaint)
+        }
+        val rad = (sweep - 90.0) * PI / 180.0
+        canvas.drawLine(cx, cy, cx + (maxR * cos(rad)).toFloat(), cy + (maxR * sin(rad)).toFloat(), sweepLine)
 
-        // centre = You
-        fillPaint.color = amber
-        canvas.drawCircle(cx, cy, dp(26f), fillPaint)
-        textPaint.color = onAmber
-        textPaint.textSize = dp(12f)
-        textPaint.isFakeBoldText = true
-        canvas.drawText("You", cx, cy + dp(4f), textPaint)
-        textPaint.isFakeBoldText = false
+        fill.color = brand
+        canvas.drawCircle(cx, cy, dp(24f), fill)
+        text.color = Color.WHITE
+        text.textSize = dp(12f)
+        text.isFakeBoldText = true
+        canvas.drawText(context.getString(R.string.you), cx, cy + dp(4f), text)
 
         if (people.isEmpty()) {
-            textPaint.color = muted
-            textPaint.textSize = dp(13f)
-            canvas.drawText("Waiting for others to join…", cx, cy + maxR + dp(20f), textPaint)
+            text.isFakeBoldText = false
+            text.color = muted
+            text.textSize = dp(13f)
+            canvas.drawText(context.getString(R.string.radar_waiting), cx, cy + maxR + dp(22f), text)
             return
         }
 
-        // blips around the ring
-        val r = maxR * 0.72f
-        val n = people.size
-        for (i in 0 until n) {
-            val ang = (-90.0 + i * (360.0 / n)) * PI / 180.0
+        val r = maxR * 0.74f
+        for ((i, p) in people.withIndex()) {
+            val ang = (-90.0 + 30.0 + i * (360.0 / people.size)) * PI / 180.0
             val x = cx + (r * cos(ang)).toFloat()
             val y = cy + (r * sin(ang)).toFloat()
-            fillPaint.color = blip
-            canvas.drawCircle(x, y, dp(10f), fillPaint)
-            textPaint.color = ink
-            textPaint.textSize = dp(12f)
-            canvas.drawText(people[i], x, y + dp(24f), textPaint)
+            fill.color = Avatar.color(p.id)
+            canvas.drawCircle(x, y, dp(16f), fill)
+            text.color = Color.WHITE
+            text.textSize = dp(12f)
+            text.isFakeBoldText = true
+            canvas.drawText(Avatar.initials(p.name), x, y + dp(4f), text)
+            text.isFakeBoldText = false
+            text.color = ink
+            text.textSize = dp(12f)
+            canvas.drawText(p.name.take(14), x, y + dp(32f), text)
         }
     }
 }

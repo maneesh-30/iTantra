@@ -12,6 +12,8 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.NetworkInterface
+import java.util.Locale
 import java.util.UUID
 import kotlin.concurrent.thread
 
@@ -19,239 +21,232 @@ import kotlin.concurrent.thread
  * WifiTransport — sends messages over the local WiFi network using UDP broadcast.
  *
  * Why broadcast (not multicast): many phone hotspots and home routers silently drop
- * multicast packets. Plain UDP broadcast to 255.255.255.255 stays on the local link and
- * is delivered far more reliably. It is still one-to-many (a walkie-talkie), so it mirrors
- * how a LoRa channel works — swapping in LoRa later keeps the same model.
+ * multicast packets. Plain UDP broadcast stays on the local link and is delivered far more
+ * reliably. It is one-to-many (a walkie-talkie), so it mirrors how a LoRa channel works.
  *
- * Channel model: every phone sends to the same port. Each packet carries the channel name;
- * a phone only accepts packets whose channel matches its own. "Same channel name" = same group.
- *
- * The phones must be on the same WiFi network or the same phone's hotspot. No internet is used.
+ * Packets are small JSON objects. Every packet carries the channel name; a phone only accepts
+ * packets for its own channel (compared case-insensitively). Packet types:
+ *   voice     a message (text, language, alert flag)
+ *   presence  "I'm here" heartbeat every 2 s; with "bye": true it means "I'm leaving"
+ *   heard     receipt sent straight back to the sender of a voice message
+ * Packets carry "v": 2. Older builds treat unknown types as messages, so receipts are only
+ * sent to phones that announce v2, and leaving piggybacks on the presence type.
  */
 class WifiTransport(private val context: Context) : Transport {
 
-    private val broadcastAddr = InetAddress.getByName("255.255.255.255")
     private val port = 45454
-
     private val selfId = UUID.randomUUID().toString()
     private val deviceName = Build.MODEL ?: "phone"
 
-    // Name others see as the sender. Defaults to the device model until the user sets one.
     @Volatile private var displayName = deviceName
-
-    private var channel: String = ""
-    private var socket: DatagramSocket? = null
+    @Volatile private var channel = ""
+    @Volatile private var socket: DatagramSocket? = null
     private var multicastLock: WifiManager.MulticastLock? = null
     private var wifiLock: WifiManager.WifiLock? = null
-    @Volatile private var running = false
 
-    // Each message carries a unique id; we drop ids we've already seen so the same message
-    // (sent twice and to several broadcast addresses for reliability) is shown/spoken only once.
-    private val seenIds = object : LinkedHashMap<String, Boolean>(300, 0.75f, false) {
-        override fun removeEldestEntry(eldest: Map.Entry<String, Boolean>) = size > 300
-    }
+    // Each packet has a unique id; packets are sent twice to several addresses for reliability,
+    // so drop ids we have already handled.
+    private val seenIds = boundedMap<String, Boolean>(400)
+    // Ids of our own messages, so receipts for them can be matched.
+    private val sentIds = boundedMap<String, Boolean>(200)
 
-    // Live roster of others on the channel, kept fresh by presence heartbeats.
-    private val roster = HashMap<String, Long>()          // name -> last-heard (elapsedRealtime)
-    private val presenceIntervalMs = 2000L                // how often we announce ourselves
-    private val presenceTimeoutMs = 6000L                 // drop someone after 3 missed beats
+    private val roster = HashMap<String, Pair<String, Long>>()  // peer id -> (name, last heard)
+    private val presenceIntervalMs = 2000L
+    private val presenceTimeoutMs = 6000L                      // ~3 missed heartbeats
 
     private var onMessage: ((Message) -> Unit)? = null
-    private var onRoster: ((List<String>) -> Unit)? = null
-    private val mainHandler = Handler(Looper.getMainLooper())
+    private var onRoster: ((List<Peer>) -> Unit)? = null
+    private var onHeard: ((String, Peer) -> Unit)? = null
+    private var onLink: ((Boolean) -> Unit)? = null
+    private val main = Handler(Looper.getMainLooper())
 
-    override fun setOnMessage(handler: (Message) -> Unit) {
-        onMessage = handler
-    }
-
-    override fun setOnRoster(handler: (List<String>) -> Unit) {
-        onRoster = handler
-    }
+    override fun setOnMessage(handler: (Message) -> Unit) { onMessage = handler }
+    override fun setOnRoster(handler: (List<Peer>) -> Unit) { onRoster = handler }
+    override fun setOnHeard(handler: (String, Peer) -> Unit) { onHeard = handler }
+    override fun setOnLinkChange(handler: (Boolean) -> Unit) { onLink = handler }
 
     override fun setDisplayName(name: String) {
-        val trimmed = name.trim()
-        displayName = if (trimmed.isEmpty()) deviceName else trimmed
+        displayName = name.trim().ifEmpty { deviceName }
     }
 
     override fun start(channel: String) {
         stop()
-        this.channel = channel.trim()
+        this.channel = channel.trim().uppercase(Locale.ROOT)
 
-        // Android drops broadcast/multicast packets on WiFi unless we hold this lock.
         val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        multicastLock = wifi.createMulticastLock("itantra").apply {
-            setReferenceCounted(true)
-            acquire()
-        }
+        // Android drops broadcast packets on WiFi unless we hold this lock.
+        multicastLock = wifi.createMulticastLock("itantra").apply { setReferenceCounted(false); acquire() }
+        // Keep WiFi fully awake so we keep receiving while the phone is idle.
+        val mode = if (Build.VERSION.SDK_INT >= 29) WifiManager.WIFI_MODE_FULL_LOW_LATENCY
+        else @Suppress("DEPRECATION") WifiManager.WIFI_MODE_FULL_HIGH_PERF
+        wifiLock = wifi.createWifiLock(mode, "itantra-wifi").apply { setReferenceCounted(false); acquire() }
 
-        // Keep WiFi fully awake so we keep receiving broadcasts while the phone is idle.
-        val wifiMode = if (Build.VERSION.SDK_INT >= 29) {
-            WifiManager.WIFI_MODE_FULL_LOW_LATENCY
-        } else {
-            @Suppress("DEPRECATION")
-            WifiManager.WIFI_MODE_FULL_HIGH_PERF
+        val s = DatagramSocket(null).apply {
+            reuseAddress = true
+            broadcast = true
+            bind(InetSocketAddress(port))
         }
-        wifiLock = wifi.createWifiLock(wifiMode, "itantra-wifi").apply {
-            setReferenceCounted(false)
-            acquire()
-        }
-
-        val s = DatagramSocket(null)
-        s.reuseAddress = true
-        s.broadcast = true
-        s.bind(InetSocketAddress(port))
         socket = s
-        running = true
-        Log.i("iTantraNet", "started: channel='${this.channel}' port=$port self=$selfId")
+        Log.i(TAG, "started: channel='${this.channel}' self=$selfId")
+        // Both loops end when `socket` stops being `s`, so leaving and rejoining never leaves
+        // an old loop spinning on a closed socket.
+        thread(name = "itantra-rx") { receiveLoop(s) }
+        thread(name = "itantra-beat") { heartbeatLoop(s) }
+    }
 
-        thread {
-            val buf = ByteArray(8192)
-            while (running) {
-                try {
-                    val packet = DatagramPacket(buf, buf.size)
-                    s.receive(packet)
-                    val json = String(packet.data, 0, packet.length, Charsets.UTF_8)
-                    Log.i("iTantraNet", "recv raw from ${packet.address}: $json")
-                    val obj = JSONObject(json)
-                    if (obj.optString("id") == selfId) continue          // ignore our own
-                    if (obj.optString("ch") != this.channel) continue    // wrong channel
-                    val mid = obj.optString("mid")
-                    if (mid.isNotEmpty()) {
-                        val dup = synchronized(seenIds) { seenIds.put(mid, true) != null }
-                        if (dup) continue                                 // already shown this message
-                    }
-                    if (obj.optString("type", "voice") == "presence") {   // heartbeat, not a message
-                        val who = obj.optString("from", "phone")
-                        synchronized(roster) { roster[who] = SystemClock.elapsedRealtime() }
-                        notifyRoster()
-                        continue
-                    }
-                    val msg = Message(
-                        text = obj.optString("text"),
-                        alert = obj.optBoolean("alert", false),
-                        from = obj.optString("from", "phone"),
-                        lang = obj.optString("lang", "en"),
-                    )
-                    Log.i("iTantraNet", "deliver: ${msg.from}: ${msg.text}")
-                    mainHandler.post { onMessage?.invoke(msg) }
-                } catch (e: Exception) {
-                    if (running) Log.w("iTantraNet", "receive error", e)
-                }
+    override fun send(text: String, alert: Boolean, lang: String): String {
+        val mid = UUID.randomUUID().toString()
+        synchronized(sentIds) { sentIds[mid] = true }
+        val json = packet("voice", mid).put("alert", alert).put("text", text).put("lang", lang)
+        thread { broadcast(json) }
+        return mid
+    }
+
+    override fun stop() {
+        val s = socket
+        socket = null
+        if (s != null) {
+            // Say goodbye so others drop us now rather than after the timeout, then close.
+            val bye = packet("presence").put("bye", true)
+            thread {
+                broadcast(bye, s)
+                s.close()
             }
         }
+        synchronized(roster) { roster.clear() }
+        notifyRoster()
+        runCatching { multicastLock?.release() }
+        runCatching { wifiLock?.release() }
+        multicastLock = null
+        wifiLock = null
+    }
 
-        // Heartbeat: announce ourselves every ~2s and drop people we stop hearing from.
-        thread {
-            while (running) {
-                sendPresence()
-                pruneRoster()
-                try {
-                    Thread.sleep(presenceIntervalMs)
-                } catch (_: InterruptedException) {
+    private fun receiveLoop(s: DatagramSocket) {
+        val buf = ByteArray(8192)
+        while (socket === s) {
+            try {
+                val p = DatagramPacket(buf, buf.size)
+                s.receive(p)
+                handle(JSONObject(String(p.data, 0, p.length, Charsets.UTF_8)), p.address)
+            } catch (e: Exception) {
+                if (socket === s) Log.w(TAG, "receive error", e)
+            }
+        }
+    }
+
+    private fun handle(obj: JSONObject, sender: InetAddress) {
+        val fromId = obj.optString("id")
+        if (fromId.isEmpty() || fromId == selfId) return
+        if (!obj.optString("ch").equals(channel, ignoreCase = true)) return
+        val mid = obj.optString("mid")
+        if (mid.isNotEmpty() && synchronized(seenIds) { seenIds.put(mid, true) != null }) return
+
+        val from = Peer(fromId, obj.optString("from").ifBlank { "Phone" })
+        when (obj.optString("type", "voice")) {
+            "presence" -> if (obj.optBoolean("bye")) forget(fromId) else touch(from)
+            "heard" -> {
+                val ref = obj.optString("ref")
+                if (synchronized(sentIds) { sentIds.containsKey(ref) }) main.post { onHeard?.invoke(ref, from) }
+            }
+            else -> {
+                val text = obj.optString("text").trim()
+                if (text.isEmpty()) return
+                touch(from)
+                val msg = Message(mid, text, obj.optBoolean("alert"), from, obj.optString("lang", "en"))
+                main.post { onMessage?.invoke(msg) }
+                // Receipt, straight back to the sender, only if their app understands it.
+                if (mid.isNotEmpty() && obj.optInt("v") >= 2) {
+                    send(packet("heard").put("ref", mid), listOf(sender))
                 }
             }
         }
     }
 
-    override fun send(text: String, alert: Boolean, lang: String) {
-        if (socket == null) return
-        val ch = channel
-        val json = JSONObject()
-            .put("id", selfId)
-            .put("mid", UUID.randomUUID().toString())
-            .put("ch", ch)
-            .put("type", "voice")
-            .put("alert", alert)
-            .put("text", text)
-            .put("from", displayName)
-            .put("lang", lang)
-            .toString()
-        thread { sendBytes(json) }
+    private fun heartbeatLoop(s: DatagramSocket) {
+        var lastLink: Boolean? = null
+        while (socket === s) {
+            broadcast(packet("presence"), s)
+            prune()
+            val link = hasLocalNetwork()
+            if (link != lastLink) {
+                lastLink = link
+                main.post { onLink?.invoke(link) }
+            }
+            try { Thread.sleep(presenceIntervalMs) } catch (_: InterruptedException) { }
+        }
     }
 
-    /** Broadcast a tiny "I'm here" heartbeat so others keep us on their roster. */
-    private fun sendPresence() {
-        if (socket == null) return
-        val json = JSONObject()
+    private fun packet(type: String, mid: String = UUID.randomUUID().toString()): JSONObject =
+        JSONObject()
+            .put("v", 2)
             .put("id", selfId)
-            .put("mid", UUID.randomUUID().toString())
+            .put("mid", mid)
             .put("ch", channel)
-            .put("type", "presence")
+            .put("type", type)
             .put("from", displayName)
-            .toString()
-        sendBytes(json)
-    }
 
-    /** Send one UDP payload to every broadcast address (twice; UDP can drop, payload is tiny). */
-    private fun sendBytes(json: String) {
-        val s = socket ?: return
+    private fun broadcast(json: JSONObject, s: DatagramSocket? = socket) = send(json, broadcastAddresses(), s)
+
+    /** Send one payload to each address, twice (UDP can drop packets; the payload is tiny). */
+    private fun send(json: JSONObject, to: List<InetAddress>, s: DatagramSocket? = socket) {
+        s ?: return
         try {
-            val bytes = json.toByteArray(Charsets.UTF_8)
-            // Every interface's directed broadcast (e.g. 192.168.x.255) plus the limited broadcast.
-            // On a hotspot HOST, 255.255.255.255 does not reach clients, but the interface's does.
-            for (addr in broadcastAddresses()) {
-                val packet = DatagramPacket(bytes, bytes.size, addr, port)
-                s.send(packet)
-                s.send(packet)
+            val bytes = json.toString().toByteArray(Charsets.UTF_8)
+            for (addr in to) {
+                val p = DatagramPacket(bytes, bytes.size, addr, port)
+                s.send(p)
+                s.send(p)
             }
         } catch (e: Exception) {
-            Log.w("iTantraNet", "send error", e)
+            Log.w(TAG, "send error", e)
         }
     }
 
-    /** Remove people we haven't heard a heartbeat from recently, then notify if it changed. */
-    private fun pruneRoster() {
-        val now = SystemClock.elapsedRealtime()
-        var changed = false
-        synchronized(roster) {
-            val it = roster.entries.iterator()
-            while (it.hasNext()) {
-                if (now - it.next().value > presenceTimeoutMs) {
-                    it.remove(); changed = true
-                }
-            }
+    private fun touch(p: Peer) {
+        val changed = synchronized(roster) {
+            val old = roster.put(p.id, p.name to SystemClock.elapsedRealtime())
+            old == null || old.first != p.name
         }
         if (changed) notifyRoster()
     }
 
-    /** Push the current roster (sorted names) to the UI on the main thread. */
+    private fun forget(id: String) {
+        if (synchronized(roster) { roster.remove(id) != null }) notifyRoster()
+    }
+
+    private fun prune() {
+        val now = SystemClock.elapsedRealtime()
+        val changed = synchronized(roster) { roster.entries.removeIf { now - it.value.second > presenceTimeoutMs } }
+        if (changed) notifyRoster()
+    }
+
     private fun notifyRoster() {
-        val names = synchronized(roster) { roster.keys.sorted() }
-        mainHandler.post { onRoster?.invoke(names) }
+        val peers = synchronized(roster) { roster.map { Peer(it.key, it.value.first) } }
+            .sortedBy { it.name.lowercase() }
+        main.post { onRoster?.invoke(peers) }
     }
 
-    /** All usable broadcast addresses (per-interface directed broadcast + limited broadcast). */
-    private fun broadcastAddresses(): List<InetAddress> {
-        val list = mutableListOf<InetAddress>()
-        try {
-            val ifaces = java.net.NetworkInterface.getNetworkInterfaces()
-            for (ni in ifaces) {
-                if (!ni.isUp || ni.isLoopback) continue
-                for (ia in ni.interfaceAddresses) {
-                    ia.broadcast?.let { if (!list.contains(it)) list.add(it) }
-                }
-            }
-        } catch (_: Exception) {
-        }
-        if (!list.contains(broadcastAddr)) list.add(broadcastAddr)
-        return list
-    }
+    companion object {
+        private const val TAG = "iTantraNet"
+        private val LIMITED_BROADCAST: InetAddress = InetAddress.getByAddress(byteArrayOf(-1, -1, -1, -1))
 
-    override fun stop() {
-        running = false
-        synchronized(roster) { roster.clear() }
-        notifyRoster()
-        socket?.close()
-        socket = null
-        try {
-            multicastLock?.release()
-        } catch (_: Exception) {
+        private fun <K, V> boundedMap(max: Int) = object : LinkedHashMap<K, V>(max, 0.75f, false) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<K, V>) = size > max
         }
-        multicastLock = null
-        try {
-            wifiLock?.release()
-        } catch (_: Exception) {
+
+        /** Every interface's directed broadcast (e.g. 192.168.x.255), plus 255.255.255.255.
+         *  On a hotspot host, 255.255.255.255 does not reach clients but the directed one does. */
+        private fun broadcastAddresses(): List<InetAddress> {
+            val list = runCatching {
+                NetworkInterface.getNetworkInterfaces()?.toList().orEmpty()
+                    .filter { it.isUp && !it.isLoopback }
+                    .flatMap { ni -> ni.interfaceAddresses.mapNotNull { it.broadcast } }
+                    .distinct()
+            }.getOrDefault(emptyList())
+            return list + LIMITED_BROADCAST
         }
-        wifiLock = null
+
+        /** True when this phone is on a local network others can reach: WiFi, or hosting a hotspot. */
+        fun hasLocalNetwork(): Boolean = broadcastAddresses().size > 1
     }
 }
