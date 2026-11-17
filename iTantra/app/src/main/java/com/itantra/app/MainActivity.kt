@@ -180,7 +180,6 @@ class MainActivity : AppCompatActivity(), TalkButton.Listener, ChatAdapter.Liste
         }
 
         setLanguage(Language.fromCode(prefs.getString("lang", null)), force = true)
-        ui.post(netPoll)
     }
 
     private fun bindViews() {
@@ -311,9 +310,7 @@ class MainActivity : AppCompatActivity(), TalkButton.Listener, ChatAdapter.Liste
                 sttReady = ok
                 sttFailed = !ok
                 showLangStatus()
-                if (!recording && !transcribing) {
-                    talkButton.state = if (ok) TalkButton.State.IDLE else TalkButton.State.LOADING
-                }
+                if (!recording && !transcribing) talkButton.state = idleState()
                 updateHint()
             }
         }
@@ -586,9 +583,13 @@ class MainActivity : AppCompatActivity(), TalkButton.Listener, ChatAdapter.Liste
         cancelArmed = false
         speaker.setPaused(false)
         if (!send) {
-            thread { recorder.stop() }
-            talkButton.state = TalkButton.State.IDLE
+            // Stay busy until the mic is fully closed, so a quick re-press can't collide with it.
+            talkButton.state = TalkButton.State.BUSY
             flashHint(getString(R.string.hint_cancelled))
+            thread {
+                recorder.stop()
+                runOnUiThread { talkButton.state = idleState() }
+            }
             return
         }
         transcribing = true
@@ -604,7 +605,7 @@ class MainActivity : AppCompatActivity(), TalkButton.Listener, ChatAdapter.Liste
             }.getOrDefault("")
             runOnUiThread {
                 transcribing = false
-                talkButton.state = if (sttReady) TalkButton.State.IDLE else TalkButton.State.LOADING
+                talkButton.state = idleState()
                 when {
                     tooShort -> flashHint(getString(R.string.hint_too_short))
                     text.isEmpty() -> flashHint(getString(R.string.hint_not_heard))
@@ -615,6 +616,12 @@ class MainActivity : AppCompatActivity(), TalkButton.Listener, ChatAdapter.Liste
                 }
             }
         }
+    }
+
+    private fun idleState() = when {
+        sttReady -> TalkButton.State.IDLE
+        sttFailed -> TalkButton.State.DISABLED
+        else -> TalkButton.State.LOADING
     }
 
     private fun sendMessage(text: String, lang: Language, alert: Boolean) {
@@ -839,6 +846,18 @@ class MainActivity : AppCompatActivity(), TalkButton.Listener, ChatAdapter.Liste
         val s = ms / 1000
         return if (s >= 3600) String.format(Locale.US, "%d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
         else String.format(Locale.US, "%d:%02d", s / 60, s % 60)
+    }
+
+    // Timers only run while the screen is visible.
+    override fun onStart() {
+        super.onStart()
+        ui.post(if (joined) clock else netPoll)
+    }
+
+    override fun onStop() {
+        ui.removeCallbacks(clock)
+        ui.removeCallbacks(netPoll)
+        super.onStop()
     }
 
     override fun onDestroy() {

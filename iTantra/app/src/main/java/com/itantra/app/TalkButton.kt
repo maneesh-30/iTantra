@@ -32,7 +32,8 @@ class TalkButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyle: Int = 0,
 ) : View(context, attrs, defStyle) {
 
-    enum class State { LOADING, IDLE, RECORDING, BUSY }
+    /** LOADING = speech is being prepared (spinner); DISABLED = speech unavailable (grey, still). */
+    enum class State { LOADING, DISABLED, IDLE, RECORDING, BUSY }
 
     interface Listener {
         fun onTalkStart()
@@ -107,7 +108,7 @@ class TalkButton @JvmOverloads constructor(
         when (state) {
             State.RECORDING -> loopAnim = loop(1400) { ringPhase = it }
             State.BUSY, State.LOADING -> loopAnim = loop(900) { spin = it * 360f }
-            State.IDLE -> Unit
+            State.IDLE, State.DISABLED -> Unit
         }
         if (state != State.RECORDING) {
             level = 0f
@@ -126,7 +127,7 @@ class TalkButton @JvmOverloads constructor(
     }
 
     private fun targetColor() = when {
-        state == State.LOADING -> disabled
+        state == State.LOADING || state == State.DISABLED -> disabled
         alertMode -> if (pressing) alertDeep else alert
         else -> if (pressing) brandDeep else brand
     }
@@ -197,7 +198,7 @@ class TalkButton @JvmOverloads constructor(
         if (!isEnabled) return false
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                if (state == State.LOADING) {
+                if (state == State.LOADING || state == State.DISABLED) {
                     shake()
                     listener?.onTalkStart()  // lets the screen explain why nothing happens
                     return true

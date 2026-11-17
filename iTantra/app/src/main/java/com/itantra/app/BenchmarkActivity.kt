@@ -108,7 +108,7 @@ class BenchmarkActivity : AppCompatActivity(), TalkButton.Listener {
             val ok = runCatching { Engines.withStt(assets, language) { } }.isSuccess
             runOnUiThread {
                 ready = ok
-                btnRead.state = if (ok) TalkButton.State.IDLE else TalkButton.State.LOADING
+                btnRead.state = if (ok) TalkButton.State.IDLE else TalkButton.State.DISABLED
                 tvStatus.text = if (ok) getString(R.string.bench_hold) else getString(R.string.lang_failed, language.display)
             }
         }
@@ -151,9 +151,15 @@ class BenchmarkActivity : AppCompatActivity(), TalkButton.Listener {
         if (!recording) return
         recording = false
         if (cancelled) {
-            thread { recorder.stop() }
-            btnRead.state = TalkButton.State.IDLE
-            tvStatus.text = getString(R.string.bench_hold)
+            btnRead.state = TalkButton.State.BUSY  // until the mic is closed
+            tvStatus.text = getString(R.string.hint_cancelled)
+            thread {
+                recorder.stop()
+                runOnUiThread {
+                    btnRead.state = TalkButton.State.IDLE
+                    tvStatus.text = getString(R.string.bench_hold)
+                }
+            }
             return
         }
         btnRead.state = TalkButton.State.BUSY
@@ -212,7 +218,7 @@ class BenchmarkActivity : AppCompatActivity(), TalkButton.Listener {
         }
         progress.setProgressCompat(sentences.size, true)
         btnNext.isEnabled = false
-        btnRead.state = TalkButton.State.LOADING
+        btnRead.state = TalkButton.State.DISABLED
         tvStatus.text = getString(R.string.bench_done)
         showResult()
     }
