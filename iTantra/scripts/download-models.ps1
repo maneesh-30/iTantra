@@ -4,6 +4,7 @@
 #   powershell -ExecutionPolicy Bypass -File scripts\download-models.ps1
 #
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'   # Windows PowerShell's progress bar makes big downloads crawl
 
 $root     = Split-Path -Parent $PSScriptRoot
 $assets   = Join-Path $root 'app\src\main\assets'
@@ -48,21 +49,30 @@ Copy-Item "$vd\tokens.txt"               $ttsDir -Force
 Copy-Item "$vd\espeak-ng-data"           $ttsDir -Recurse -Force
 
 # --- Hindi models ---
-$hiSttUrl = 'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2'
+# Hindi STT is AI4Bharat IndicConformer (NeMo CTC, int8), loaded by SttEngine from assets/hi-stt-ic/.
+# sherpa-onnx does not publish it, so we use a community sherpa-onnx export, pinned to one
+# commit and checked by SHA-256 (tokens.txt is the vocabulary shared by all Indian languages).
+$icBase   = 'https://huggingface.co/parismitaglobalsolutions/indicconformer-sherpa-onnx/resolve/9721eb71eea141fae0982cfcdb9dd2e3d4953c4a'
 $hiTtsUrl = 'https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-hi_IN-rohan-medium-int8.tar.bz2'
-Write-Host 'Downloading Hindi STT (Whisper small, ~610 MB)...'
-Invoke-WebRequest -Uri $hiSttUrl -OutFile "$tmp\hi-stt.tar.bz2" -UseBasicParsing
+
+$hiSttDir = Join-Path $assets 'hi-stt-ic'
+New-Item -ItemType Directory -Force -Path $hiSttDir | Out-Null
+Write-Host 'Downloading Hindi STT (IndicConformer int8, ~198 MB)...'
+$hiStt = @{
+    'hi/model.int8.onnx' = @('model.int8.onnx', '915c71e04dd7e5378a4057fdebb252b3a587188e4e99db6d7ce0909ad5ad05fa')
+    'tokens.txt'         = @('tokens.txt',      'ee60967630213f31951817ac8b402b92ec18cce80718a24a49b388e56672dfb2')
+}
+foreach ($src in $hiStt.Keys) {
+    $out, $sha = $hiStt[$src]
+    $dest = Join-Path $hiSttDir $out
+    Invoke-WebRequest -Uri "$icBase/$src" -OutFile $dest -UseBasicParsing
+    $got = (Get-FileHash $dest -Algorithm SHA256).Hash
+    if ($got -ne $sha) { Remove-Item $dest; throw "Checksum mismatch for $src (got $got)" }
+}
+
 Write-Host 'Downloading Hindi TTS (Piper, ~20 MB)...'
 Invoke-WebRequest -Uri $hiTtsUrl -OutFile "$tmp\hi-tts.tar.bz2" -UseBasicParsing
-tar -xjf "$tmp\hi-stt.tar.bz2" -C $tmp
 tar -xjf "$tmp\hi-tts.tar.bz2" -C $tmp
-
-$hiSttDir = Join-Path $assets 'hi-stt'
-New-Item -ItemType Directory -Force -Path $hiSttDir | Out-Null
-$ds = "$tmp\sherpa-onnx-whisper-small"
-Copy-Item "$ds\small-encoder.int8.onnx" $hiSttDir -Force
-Copy-Item "$ds\small-decoder.onnx"      $hiSttDir -Force   # float decoder (int8 degenerates)
-Copy-Item "$ds\small-tokens.txt"        $hiSttDir -Force
 
 $hiTtsDir = Join-Path $assets 'hi-tts'
 New-Item -ItemType Directory -Force -Path $hiTtsDir | Out-Null
