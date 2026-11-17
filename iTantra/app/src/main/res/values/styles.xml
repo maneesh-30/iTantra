@@ -26,9 +26,8 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/segment_text</item>
         <item name="backgroundTint">@color/segment_bg</item>
-        <item name="strokeColor">@color/outline</item>
+        <item name="strokeColor">@color/segment_stroke</item>
         <item name="iconTint">@color/segment_text</item>
-        <item name="rippleColor">@color/brand_tint</item>
     </style>
 
     <!-- Round icon button (alert, keyboard, send, header actions) -->
@@ -57,7 +56,14 @@
         <item name="boxStrokeColor">@color/brand</item>
         <item name="hintTextColor">@color/brand</item>
         <item name="helperTextTextColor">@color/muted</item>
+        <item name="helperTextTextAppearance">@style/TextAppearance.ITantra.Helper</item>
+        <item name="errorTextAppearance">@style/TextAppearance.ITantra.Helper</item>
         <item name="placeholderTextColor">@color/muted</item>
+    </style>
+
+    <style name="TextAppearance.ITantra.Helper" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">13sp</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 
     <style name="Widget.ITantra.BottomSheet" parent="Widget.Material3.BottomSheet">

@@ -34,7 +34,6 @@ import kotlin.concurrent.thread
  */
 class WifiTransport(private val context: Context) : Transport {
 
-    private val port = 45454
     private val selfId = UUID.randomUUID().toString()
     private val deviceName = Build.MODEL ?: "phone"
 
@@ -84,7 +83,7 @@ class WifiTransport(private val context: Context) : Transport {
         val s = DatagramSocket(null).apply {
             reuseAddress = true
             broadcast = true
-            bind(InetSocketAddress(port))
+            bind(InetSocketAddress(PORT))
         }
         socket = s
         Log.i(TAG, "started: channel='${this.channel}' self=$selfId")
@@ -193,7 +192,7 @@ class WifiTransport(private val context: Context) : Transport {
         try {
             val bytes = json.toString().toByteArray(Charsets.UTF_8)
             for (addr in to) {
-                val p = DatagramPacket(bytes, bytes.size, addr, port)
+                val p = DatagramPacket(bytes, bytes.size, addr, PORT)
                 s.send(p)
                 s.send(p)
             }
@@ -228,6 +227,9 @@ class WifiTransport(private val context: Context) : Transport {
 
     companion object {
         private const val TAG = "iTantraNet"
+        // A constant, not a property named `port`: inside DatagramSocket.apply {} that name
+        // would silently mean the socket's own port (-1 before binding).
+        private const val PORT = 45454
         private val LIMITED_BROADCAST: InetAddress = InetAddress.getByAddress(byteArrayOf(-1, -1, -1, -1))
 
         private fun <K, V> boundedMap(max: Int) = object : LinkedHashMap<K, V>(max, 0.75f, false) {

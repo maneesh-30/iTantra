@@ -232,13 +232,16 @@ class MainActivity : AppCompatActivity(), TalkButton.Listener, ChatAdapter.Liste
 
     /** The app draws edge to edge: keep content clear of the status bar, nav bar and keyboard. */
     private fun applyInsets() {
+        val joinBar = findViewById<View>(R.id.joinBar)
+        val joinBarBottom = joinBar.paddingBottom
         val headerBottom = header.paddingBottom
         val dockTop = dock.paddingTop
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             val bottom = max(bars.bottom, ime.bottom)
-            joinScreen.setPadding(bars.left, bars.top, bars.right, bottom)
+            joinScreen.setPadding(bars.left, bars.top, bars.right, 0)
+            joinBar.setPadding(joinBar.paddingLeft, joinBar.paddingTop, joinBar.paddingRight, joinBarBottom + bottom)
             header.setPadding(bars.left, bars.top, bars.right, headerBottom)
             dock.setPadding(bars.left, dockTop, bars.right, bottom)
             insets

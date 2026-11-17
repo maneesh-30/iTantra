@@ -66,6 +66,7 @@ class TalkButton @JvmOverloads constructor(
     private val alert = ContextCompat.getColor(context, R.color.alert)
     private val alertDeep = ContextCompat.getColor(context, R.color.alert_deep)
     private val disabled = ContextCompat.getColor(context, R.color.disabled)
+    private val cancelGrey = ContextCompat.getColor(context, R.color.muted)
 
     private val micIcon = ContextCompat.getDrawable(context, R.drawable.ic_mic)!!.mutate()
     private val closeIcon = ContextCompat.getDrawable(context, R.drawable.ic_close)!!.mutate()
@@ -128,6 +129,7 @@ class TalkButton @JvmOverloads constructor(
 
     private fun targetColor() = when {
         state == State.LOADING || state == State.DISABLED -> disabled
+        armed -> cancelGrey
         alertMode -> if (pressing) alertDeep else alert
         else -> if (pressing) brandDeep else brand
     }
@@ -214,11 +216,13 @@ class TalkButton @JvmOverloads constructor(
                 listener?.onTalkStart()
             }
             MotionEvent.ACTION_MOVE -> if (pressing && state == State.RECORDING) {
-                dragX = (event.x - downX).coerceIn(-cancelDistance * 1.25f, 0f) * 0.6f
+                // The button follows the finger a little (not far enough to cover its neighbours).
+                dragX = (event.x - downX).coerceIn(-cancelDistance * 1.25f, 0f) * 0.3f
                 val nowArmed = event.x - downX <= -cancelDistance
                 if (nowArmed != armed) {
                     armed = nowArmed
                     performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    animateColor()
                     listener?.onCancelArmed(armed)
                 }
                 invalidate()
