@@ -45,6 +45,8 @@ class TtsEngine(context: Context, val language: Language) {
             )
         }
 
+        context.assets.requireAssets(vits.model, vits.tokens)
+
         val config = OfflineTtsConfig(
             model = OfflineTtsModelConfig(vits = vits, numThreads = 2),
         )

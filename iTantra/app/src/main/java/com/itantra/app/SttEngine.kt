@@ -49,6 +49,13 @@ class SttEngine(assetManager: AssetManager, val language: Language) {
             )
         }
 
+        with(modelConfig) {
+            assetManager.requireAssets(
+                tokens, nemo.model, moonshine.preprocessor, moonshine.encoder,
+                moonshine.uncachedDecoder, moonshine.cachedDecoder,
+            )
+        }
+
         val config = OfflineRecognizerConfig(
             featConfig = FeatureConfig(sampleRate = 16000, featureDim = 80),
             modelConfig = modelConfig,
@@ -70,4 +77,14 @@ class SttEngine(assetManager: AssetManager, val language: Language) {
     fun release() {
         recognizer.release()
     }
+}
+
+/**
+ * sherpa-onnx ends the whole app (a native exit) if a model file is missing from assets, and no
+ * try/catch can stop that. So check the files first and throw a normal exception instead: both
+ * screens already catch it and show "Failed to load … models". Empty paths (unused) are skipped.
+ */
+internal fun AssetManager.requireAssets(vararg paths: String) {
+    val missing = paths.filter { it.isNotEmpty() && runCatching { open(it).close() }.isFailure }
+    check(missing.isEmpty()) { "Missing model files $missing. Run scripts/download-models, then rebuild." }
 }
