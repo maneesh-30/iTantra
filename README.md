@@ -19,7 +19,8 @@ That size difference is why iTantra survives links that cannot carry voice.
 
 ## Languages
 
-Hindi, Gujarati, Marathi, Kannada, Malayalam, Tamil, Telugu, Odia, Bengali, English.
+Target: Hindi, Gujarati, Marathi, Kannada, Malayalam, Tamil, Telugu, Odia, Bengali, English.
+Working today: **English** and **Hindi**.
 
 ## Key constraints
 
@@ -39,9 +40,12 @@ script, then open `iTantra/` in Android Studio and Run on an arm64 phone (Androi
 
 ## Status
 
-- [x] Offline speech-to-text (English) with push-to-talk, running on-device
-- [ ] Text-to-speech playback
-- [ ] Two-phone transport (WiFi / Bluetooth)
+- [x] Offline speech-to-text with push-to-talk, on-device (English: Moonshine, Hindi: AI4Bharat IndicConformer)
+- [x] Offline text-to-speech playback (Piper voices, English + Hindi)
+- [x] Alert messages (maximum volume)
+- [x] Two-phone transport over WiFi (channel-based UDP broadcast, live roster/radar)
+- [x] Benchmark screen (word error rate + real-time factor)
+- [ ] Bluetooth transport
 - [ ] Phone mode (automatic pause detection with VAD)
-- [ ] Indian-language models (AI4Bharat)
-- [ ] Alert mode and long-range LoRa transport
+- [ ] The other 8 Indian languages
+- [ ] Long-range LoRa transport

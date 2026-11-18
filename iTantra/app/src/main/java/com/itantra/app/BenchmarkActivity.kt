@@ -1,264 +1,246 @@
 package com.itantra.app
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.media.AudioFormat
-import android.media.AudioRecord
-import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.SystemClock
-import android.view.MotionEvent
-import android.view.ViewGroup
-import android.view.Window
-import android.widget.Button
+import android.view.View
 import android.widget.TextView
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import java.util.Locale
 import kotlin.concurrent.thread
 
 /**
- * BenchmarkActivity — reads fixed reference sentences aloud and measures accuracy + speed.
+ * BenchmarkActivity — the speech accuracy test.
  *
- * For each sentence: record while the button is held, transcribe on release, then compute the
- * Word Error Rate (transcription vs reference) and the Real-Time Factor (processing time ÷
- * audio length). Running overall WER and average RTF are shown at the bottom — the numbers the
- * problem statement grades (accuracy + latency).
+ * For each reference sentence: hold the button and read it, release, and the app compares
+ * what it heard with the sentence: Word Error Rate (accuracy) and Real-Time Factor
+ * (processing time ÷ audio length, speed). Running totals and a final result card follow.
  */
-class BenchmarkActivity : AppCompatActivity() {
+class BenchmarkActivity : AppCompatActivity(), TalkButton.Listener {
 
     private lateinit var tvProgress: TextView
+    private lateinit var progress: LinearProgressIndicator
     private lateinit var tvStatus: TextView
     private lateinit var tvReference: TextView
-    private lateinit var btnRead: Button
     private lateinit var tvHyp: TextView
-    private lateinit var tvSentenceMetrics: TextView
-    private lateinit var btnNext: Button
+    private lateinit var metricsRow: View
+    private lateinit var tvMetricWer: TextView
+    private lateinit var tvMetricRtf: TextView
+    private lateinit var tvMetricTime: TextView
     private lateinit var tvOverall: TextView
+    private lateinit var btnRead: TalkButton
+    private lateinit var btnNext: MaterialButton
 
     private lateinit var language: Language
     private lateinit var sentences: List<String>
     private var index = 0
-
-    private var stt: SttEngine? = null
+    private var ready = false
+    private var recording = false
+    private val recorder = MicRecorder()
 
     private var totalEdits = 0
     private var totalRefWords = 0
     private var rtfSum = 0.0
     private var rtfCount = 0
 
-    private val sampleRate = 16000
-    @Volatile private var isRecording = false
-    private val recordedChunks = ArrayList<FloatArray>()
-    private var recordThread: Thread? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+        )
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_benchmark)
 
-        language = Language.fromCode(intent.getStringExtra("lang") ?: "en")
+        language = Language.fromCode(intent.getStringExtra("lang"))
         sentences = BenchmarkSentences.forLanguage(language)
 
         tvProgress = findViewById(R.id.tvProgress)
+        progress = findViewById(R.id.progress)
         tvStatus = findViewById(R.id.tvStatus)
         tvReference = findViewById(R.id.tvReference)
-        btnRead = findViewById(R.id.btnRead)
         tvHyp = findViewById(R.id.tvHyp)
-        tvSentenceMetrics = findViewById(R.id.tvSentenceMetrics)
-        btnNext = findViewById(R.id.btnNext)
+        metricsRow = findViewById(R.id.metricsRow)
+        tvMetricWer = findViewById(R.id.tvMetricWer)
+        tvMetricRtf = findViewById(R.id.tvMetricRtf)
+        tvMetricTime = findViewById(R.id.tvMetricTime)
         tvOverall = findViewById(R.id.tvOverall)
+        btnRead = findViewById(R.id.btnRead)
+        btnNext = findViewById(R.id.btnNext)
 
-        btnRead.isEnabled = false
-        showSentence()
+        val header = findViewById<View>(R.id.benchHeader)
+        val dock = findViewById<View>(R.id.benchDock)
+        val headerStart = header.paddingStart
+        val headerTop = header.paddingTop
+        val headerEnd = header.paddingEnd
+        val dockTop = dock.paddingTop
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.benchRoot)) { _, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            header.setPadding(bars.left + headerStart, bars.top + headerTop, bars.right + headerEnd, header.paddingBottom)
+            dock.setPadding(bars.left, dockTop, bars.right, bars.bottom)
+            insets
+        }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
+        findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
+        findViewById<TextView>(R.id.tvBenchLang).text = language.native
+        progress.max = sentences.size
+        btnRead.listener = this
+        btnNext.setOnClickListener { next() }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 1)
         }
+        showSentence()
 
-        // Load the STT model for this language in the background.
-        tvStatus.text = "Loading ${language.display} model…"
+        // Load (or reuse) the shared recognizer for this language.
+        tvStatus.text = getString(R.string.lang_loading, language.display)
         thread {
-            try {
-                val engine = SttEngine(assets, language)
-                runOnUiThread {
-                    stt = engine
-                    btnRead.isEnabled = true
-                    tvStatus.text = "Hold the button and read the sentence aloud."
-                }
-            } catch (e: Throwable) {
-                android.util.Log.e("iTantraBench", "model load failed", e)
-                runOnUiThread { tvStatus.text = "Failed to load model. See logs." }
-            }
-        }
-
-        btnRead.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> { startRecording(); true }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    v.performClick(); stopAndScore(); true
-                }
-                else -> false
-            }
-        }
-
-        btnNext.setOnClickListener {
-            index++
-            if (index >= sentences.size) {
-                finishBenchmark()
-            } else {
-                tvHyp.text = "—"
-                tvSentenceMetrics.text = ""
-                btnNext.isEnabled = false
-                showSentence()
+            val ok = runCatching { Engines.withStt(assets, language) { } }.isSuccess
+            runOnUiThread {
+                ready = ok
+                btnRead.state = if (ok) TalkButton.State.IDLE else TalkButton.State.DISABLED
+                tvStatus.text = if (ok) getString(R.string.bench_hold) else getString(R.string.lang_failed, language.display)
             }
         }
     }
 
     private fun showSentence() {
-        tvProgress.text = "${index + 1} / ${sentences.size}"
+        tvProgress.text = getString(R.string.bench_progress, index + 1, sentences.size)
+        progress.setProgressCompat(index, true)
         tvReference.text = sentences[index]
+        tvHyp.text = getString(R.string.bench_nothing_yet)
+        metricsRow.visibility = View.GONE
+        btnNext.isEnabled = false
+        btnNext.setText(if (index == sentences.size - 1) R.string.bench_finish else R.string.bench_next)
+        // Slide the new sentence in.
+        tvReference.alpha = 0f
+        tvReference.translationX = 40 * resources.displayMetrics.density
+        tvReference.animate().alpha(1f).translationX(0f).setDuration(260).start()
     }
 
-    @SuppressLint("MissingPermission")
-    private fun startRecording() {
-        stt ?: return
-        if (isRecording) return
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED
-        ) { tvStatus.text = "Microphone permission needed."; return }
-
-        val minBuf = AudioRecord.getMinBufferSize(
-            sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
+    override fun onTalkStart() {
+        if (!ready) return
+        val started = recorder.start(
+            onLevel = { l -> runOnUiThread { btnRead.setLevel(l) } },
+            onLimit = { runOnUiThread { onTalkEnd(false) } },
         )
-        val bufferSizeBytes = maxOf(minBuf, sampleRate / 5 * 2)
-        val recorder = AudioRecord(
-            MediaRecorder.AudioSource.MIC, sampleRate,
-            AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSizeBytes
-        )
-        if (recorder.state != AudioRecord.STATE_INITIALIZED) {
-            tvStatus.text = "Failed to start microphone."; recorder.release(); return
+        if (!started) {
+            tvStatus.text = getString(R.string.mic_permission_needed)
+            return
         }
+        recording = true
+        btnRead.state = TalkButton.State.RECORDING
+        tvStatus.text = getString(R.string.hint_slide_cancel)
+    }
 
-        recordedChunks.clear()
-        isRecording = true
-        btnRead.text = "Listening…"
-        tvStatus.text = "Reading… release when done."
-        recorder.startRecording()
-        recordThread = thread {
-            val buffer = ShortArray(bufferSizeBytes / 2)
-            while (isRecording) {
-                val read = recorder.read(buffer, 0, buffer.size)
-                if (read > 0) {
-                    val chunk = FloatArray(read) { buffer[it] / 32768.0f }
-                    synchronized(recordedChunks) { recordedChunks.add(chunk) }
+    override fun onCancelArmed(armed: Boolean) {
+        tvStatus.text = getString(if (armed) R.string.hint_release_cancel else R.string.hint_slide_cancel)
+    }
+
+    override fun onTalkEnd(cancelled: Boolean) {
+        if (!recording) return
+        recording = false
+        if (cancelled) {
+            btnRead.state = TalkButton.State.BUSY  // until the mic is closed
+            tvStatus.text = getString(R.string.hint_cancelled)
+            thread {
+                recorder.stop()
+                runOnUiThread {
+                    btnRead.state = TalkButton.State.IDLE
+                    tvStatus.text = getString(R.string.bench_hold)
                 }
             }
-            recorder.stop(); recorder.release()
+            return
         }
-    }
-
-    private fun stopAndScore() {
-        if (!isRecording) return
-        isRecording = false
-        btnRead.text = "Hold to Read"
-        tvStatus.text = "Scoring…"
-
+        btnRead.state = TalkButton.State.BUSY
+        tvStatus.text = getString(R.string.bench_scoring)
+        val reference = sentences[index]
         thread {
-            recordThread?.join()
-            val chunks = synchronized(recordedChunks) { recordedChunks.toList() }
-            val total = chunks.sumOf { it.size }
-            if (total < sampleRate / 4) {
-                runOnUiThread { tvStatus.text = "Too short. Hold and read again." }
+            val samples = recorder.stop()
+            if (samples.size < recorder.sampleRate / 4) {
+                runOnUiThread {
+                    btnRead.state = TalkButton.State.IDLE
+                    tvStatus.text = getString(R.string.hint_too_short)
+                }
                 return@thread
             }
-            val samples = FloatArray(total)
-            var offset = 0
-            for (c in chunks) { c.copyInto(samples, offset); offset += c.size }
-
-            val audioSec = total.toDouble() / sampleRate
-            val engine = stt
+            val audioSec = samples.size.toDouble() / recorder.sampleRate
             val t0 = SystemClock.elapsedRealtime()
-            val hyp = engine?.transcribe(samples, sampleRate)?.trim().orEmpty()
+            val hyp = runCatching {
+                Engines.withStt(assets, language) { it.transcribe(samples, recorder.sampleRate) }.trim()
+            }.getOrDefault("")
             val procMs = SystemClock.elapsedRealtime() - t0
-            val rtf = (procMs / 1000.0) / audioSec
-
-            val reference = sentences[index]
+            val rtf = procMs / 1000.0 / audioSec
             val res = Wer.compare(reference, hyp)
-            totalEdits += res.edits
-            totalRefWords += res.refWords
-            rtfSum += rtf
-            rtfCount++
-
-            val overallWer = if (totalRefWords > 0) totalEdits.toDouble() / totalRefWords else 0.0
-            val avgRtf = if (rtfCount > 0) rtfSum / rtfCount else 0.0
-
-            runOnUiThread {
-                tvHyp.text = if (hyp.isEmpty()) "(nothing recognised)" else hyp
-                tvSentenceMetrics.text = String.format(
-                    Locale.US, "WER %.0f%%   ·   RTF %.2f   ·   STT %d ms",
-                    res.wer * 100, rtf, procMs
-                )
-                tvOverall.text = String.format(
-                    Locale.US, "Overall WER: %.1f%%     Avg RTF: %.2f",
-                    overallWer * 100, avgRtf
-                )
-                btnNext.isEnabled = true
-                btnNext.text = if (index == sentences.size - 1) "Finish" else "Next"
-                tvStatus.text = "Hold to read, or tap ${btnNext.text}."
-            }
+            runOnUiThread { showScore(hyp, res, rtf, procMs) }
         }
     }
 
-    private fun finishBenchmark() {
-        val overallWer = if (totalRefWords > 0) totalEdits.toDouble() / totalRefWords else 0.0
-        val avgRtf = if (rtfCount > 0) rtfSum / rtfCount else 0.0
-        btnRead.isEnabled = false
-        btnNext.isEnabled = false
-        tvReference.text = "Benchmark complete."
-        tvHyp.text = "—"
-        tvSentenceMetrics.text = ""
-        tvProgress.text = "${sentences.size} / ${sentences.size}"
-        tvStatus.text = "${language.display} · ${rtfCount} sentences scored."
-        tvOverall.text = String.format(
-            Locale.US, "Overall WER: %.1f%%     Avg RTF: %.2f", overallWer * 100, avgRtf
-        )
-        showResultDialog(overallWer * 100, avgRtf)
+    private fun showScore(hyp: String, res: Wer.Result, rtf: Double, procMs: Long) {
+        totalEdits += res.edits
+        totalRefWords += res.refWords
+        rtfSum += rtf
+        rtfCount++
+
+        btnRead.state = TalkButton.State.IDLE
+        tvHyp.text = hyp.ifEmpty { getString(R.string.bench_nothing_heard) }
+        tvMetricWer.text = String.format(Locale.US, "%.0f%%", res.wer * 100)
+        tvMetricWer.setTextColor(ContextCompat.getColor(this, if (res.edits == 0) R.color.live else R.color.ink))
+        tvMetricRtf.text = String.format(Locale.US, "%.2f", rtf)
+        tvMetricTime.text = String.format(Locale.US, "%d ms", procMs)
+        if (metricsRow.visibility != View.VISIBLE) {
+            metricsRow.alpha = 0f
+            metricsRow.visibility = View.VISIBLE
+            metricsRow.animate().alpha(1f).setDuration(220).start()
+        }
+        tvOverall.text = getString(R.string.bench_overall, overallWer() * 100, rtfSum / rtfCount)
+        btnNext.isEnabled = true
+        tvStatus.text = getString(R.string.bench_hold)
     }
 
-    /** Popup card with the final numbers — makes a clean screenshot for the deck. */
-    private fun showResultDialog(werPct: Double, avgRtf: Double) {
-        val v = layoutInflater.inflate(R.layout.dialog_benchmark_result, null)
-        v.findViewById<TextView>(R.id.tvDlgSub).text = "${language.display} · $rtfCount sentences"
-        v.findViewById<TextView>(R.id.tvDlgWer).text = String.format(Locale.US, "%.1f%%", werPct)
-        v.findViewById<TextView>(R.id.tvDlgRtf).text = String.format(Locale.US, "%.2f", avgRtf)
-        v.findViewById<TextView>(R.id.tvDlgFoot).text =
-            if (language == Language.HI) "On-device · offline · IndicConformer int8"
-            else "On-device · offline · Moonshine"
+    private fun overallWer() = if (totalRefWords > 0) totalEdits.toDouble() / totalRefWords else 0.0
 
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(v)
-        dialog.setCancelable(true)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.86).toInt(),
-            ViewGroup.LayoutParams.WRAP_CONTENT
+    private fun next() {
+        index++
+        if (index < sentences.size) {
+            showSentence()
+            return
+        }
+        progress.setProgressCompat(sentences.size, true)
+        btnNext.isEnabled = false
+        btnRead.state = TalkButton.State.DISABLED
+        tvStatus.text = getString(R.string.bench_done)
+        showResult()
+    }
+
+    private fun showResult() {
+        val v = layoutInflater.inflate(R.layout.dialog_benchmark_result, null)
+        v.findViewById<TextView>(R.id.tvDlgSub).text = getString(R.string.result_sub, language.display, rtfCount)
+        v.findViewById<TextView>(R.id.tvDlgWer).text = String.format(Locale.US, "%.1f%%", overallWer() * 100)
+        v.findViewById<TextView>(R.id.tvDlgRtf).text =
+            String.format(Locale.US, "%.2f", if (rtfCount > 0) rtfSum / rtfCount else 0.0)
+        v.findViewById<TextView>(R.id.tvDlgFoot).setText(
+            if (language == Language.HI) R.string.result_foot_hi else R.string.result_foot_en
         )
-        v.findViewById<Button>(R.id.btnDlgClose).setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        MaterialAlertDialogBuilder(this)
+            .setView(v)
+            .setPositiveButton(R.string.done) { _, _ -> finish() }
+            .setCancelable(false)
+            .show()
     }
 
     override fun onDestroy() {
+        if (recording) thread { recorder.stop() }
         super.onDestroy()
-        isRecording = false
-        recordThread?.join(500)
-        stt?.release()
     }
 }

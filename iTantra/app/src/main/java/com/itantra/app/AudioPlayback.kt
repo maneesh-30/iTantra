@@ -7,41 +7,31 @@ import android.media.AudioManager
 import android.media.AudioTrack
 
 /**
- * AudioPlayback — plays generated speech through the speaker.
+ * AudioPlayback — plays generated speech through the speaker. Used only by [Speaker], which
+ * plays one clip at a time and decides what may interrupt what.
  *
- * Normal messages play at the current media volume. Alert messages play at MAXIMUM
- * volume and run to completion without being interrupted, as the problem statement
- * requires for emergency alerts.
+ * Alert messages play at maximum media volume and are peak-normalised so they are clearly
+ * louder; the user's volume is restored afterwards.
  */
 class AudioPlayback(private val context: Context) {
 
-    @Volatile
-    private var track: AudioTrack? = null
+    @Volatile private var track: AudioTrack? = null
 
     /**
-     * Play audio samples (floats in -1.0..1.0).
-     * @param alert if true, force maximum volume for an emergency alert.
+     * Play audio samples (floats in -1.0..1.0) and block until done.
+     * @return true if it played to the end, false if [stop] cut it short.
      */
-    fun play(samplesIn: FloatArray, sampleRate: Int, alert: Boolean = false) {
-        stop() // stop anything currently playing
-
+    fun play(samplesIn: FloatArray, sampleRate: Int, alert: Boolean = false): Boolean {
+        val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        var restoreVolume = -1
         var samples = samplesIn
         if (alert) {
-            // 1) Force the media stream to maximum volume.
-            val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-            am.setStreamVolume(AudioManager.STREAM_MUSIC, max, 0)
-            // 2) Software-boost: peak-normalize so it is louder even if volume was already high.
+            restoreVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC)
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
             samples = normalize(samplesIn)
         }
 
-        val minBuf = AudioTrack.getMinBufferSize(
-            sampleRate,
-            AudioFormat.CHANNEL_OUT_MONO,
-            AudioFormat.ENCODING_PCM_FLOAT
-        )
-        val bufferSize = maxOf(minBuf, samples.size * 4) // 4 bytes per float
-
+        val minBuf = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_FLOAT)
         val audioTrack = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
@@ -56,57 +46,48 @@ class AudioPlayback(private val context: Context) {
                     .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
                     .build()
             )
-            .setBufferSizeInBytes(bufferSize)
+            .setBufferSizeInBytes(maxOf(minBuf, samples.size * 4))
             .setTransferMode(AudioTrack.MODE_STREAM)
             .build()
 
         track = audioTrack
-        audioTrack.play()
-        // Blocking write; call this from a background thread.
-        // In stream mode this returns once the data is buffered, NOT when it finishes
-        // playing, so we must wait for the buffer to drain before stopping.
-        audioTrack.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
-
-        val durationMs = samples.size * 1000L / sampleRate
-        val deadline = System.currentTimeMillis() + durationMs + 500
-        while (track === audioTrack &&
-            audioTrack.playbackHeadPosition < samples.size &&
-            System.currentTimeMillis() < deadline
-        ) {
-            Thread.sleep(20)
-        }
-
         try {
-            audioTrack.stop()
+            audioTrack.play()
+            // In stream mode write() returns once the data is buffered, not when it has played,
+            // so wait for the playback head to reach the end before stopping.
+            audioTrack.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
+            val deadline = System.currentTimeMillis() + samples.size * 1000L / sampleRate + 500
+            while (track === audioTrack &&
+                audioTrack.playbackHeadPosition < samples.size &&
+                System.currentTimeMillis() < deadline
+            ) {
+                Thread.sleep(20)
+            }
         } catch (_: Exception) {
+            // stop() released the track mid-write
         }
+        val finished = track === audioTrack
+        if (finished) track = null
+        runCatching { audioTrack.stop() }
         audioTrack.release()
-        if (track === audioTrack) track = null
+        if (restoreVolume >= 0) am.setStreamVolume(AudioManager.STREAM_MUSIC, restoreVolume, 0)
+        return finished
+    }
+
+    /** Cut the current clip short (play() then returns false). */
+    fun stop() {
+        val t = track ?: return
+        track = null
+        runCatching { t.pause(); t.flush() }
     }
 
     /** Peak-normalize to ~0.99 so alert audio uses the full volume range (louder). */
     private fun normalize(samples: FloatArray): FloatArray {
         var peak = 0f
-        for (s in samples) {
-            val a = kotlin.math.abs(s)
-            if (a > peak) peak = a
-        }
+        for (s in samples) peak = maxOf(peak, kotlin.math.abs(s))
         if (peak <= 0f) return samples
         val gain = 0.99f / peak
-        if (gain <= 1f) return samples // already loud; don't reduce
+        if (gain <= 1f) return samples
         return FloatArray(samples.size) { samples[it] * gain }
-    }
-
-    fun stop() {
-        track?.let {
-            try {
-                it.pause()
-                it.flush()
-                it.stop()
-                it.release()
-            } catch (_: Exception) {
-            }
-        }
-        track = null
     }
 }

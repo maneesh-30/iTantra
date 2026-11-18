@@ -48,20 +48,26 @@ cp "$VD/tokens.txt"               "$ASSETS/tts/"
 cp -r "$VD/espeak-ng-data"        "$ASSETS/tts/"
 
 # --- Hindi models ---
-HI_STT_URL='https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2'
+# Hindi STT is AI4Bharat IndicConformer (NeMo CTC, int8), loaded by SttEngine from assets/hi-stt-ic/.
+# sherpa-onnx does not publish it, so we use a community sherpa-onnx export, pinned to one
+# commit and checked by SHA-256 (tokens.txt is the vocabulary shared by all Indian languages).
+IC_BASE='https://huggingface.co/parismitaglobalsolutions/indicconformer-sherpa-onnx/resolve/9721eb71eea141fae0982cfcdb9dd2e3d4953c4a'
 HI_TTS_URL='https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-hi_IN-rohan-medium-int8.tar.bz2'
-echo 'Downloading Hindi STT (Whisper small, ~610 MB)...'
-curl -L "$HI_STT_URL" -o "$TMP/hi-stt.tar.bz2"
+
+sha256() { if command -v sha256sum >/dev/null; then sha256sum "$1"; else shasum -a 256 "$1"; fi | cut -d' ' -f1; }
+fetch_checked() {  # url, destination, expected sha256
+  curl -fL "$1" -o "$2"
+  [ "$(sha256 "$2")" = "$3" ] || { echo "Checksum mismatch for $1" >&2; rm -f "$2"; exit 1; }
+}
+
+mkdir -p "$ASSETS/hi-stt-ic"
+echo 'Downloading Hindi STT (IndicConformer int8, ~198 MB)...'
+fetch_checked "$IC_BASE/hi/model.int8.onnx" "$ASSETS/hi-stt-ic/model.int8.onnx" 915c71e04dd7e5378a4057fdebb252b3a587188e4e99db6d7ce0909ad5ad05fa
+fetch_checked "$IC_BASE/tokens.txt"         "$ASSETS/hi-stt-ic/tokens.txt"      ee60967630213f31951817ac8b402b92ec18cce80718a24a49b388e56672dfb2
+
 echo 'Downloading Hindi TTS (Piper, ~20 MB)...'
 curl -L "$HI_TTS_URL" -o "$TMP/hi-tts.tar.bz2"
-tar -xjf "$TMP/hi-stt.tar.bz2" -C "$TMP"
 tar -xjf "$TMP/hi-tts.tar.bz2" -C "$TMP"
-
-mkdir -p "$ASSETS/hi-stt"
-DS="$TMP/sherpa-onnx-whisper-small"
-cp "$DS/small-encoder.int8.onnx" "$ASSETS/hi-stt/"
-cp "$DS/small-decoder.onnx"      "$ASSETS/hi-stt/"   # float decoder (int8 degenerates)
-cp "$DS/small-tokens.txt"        "$ASSETS/hi-stt/"
 
 mkdir -p "$ASSETS/hi-tts"
 HV="$TMP/vits-piper-hi_IN-rohan-medium-int8"

@@ -1,22 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="FieldLabel">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/muted</item>
-        <item name="android:textSize">11sp</item>
-        <item name="android:paddingBottom">4dp</item>
+    <!-- Buttons: tall, rounded, sentence case -->
+    <style name="Widget.ITantra.Button" parent="Widget.Material3.Button">
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="shapeAppearance">@style/Shape.ITantra.Pill</item>
     </style>
 
-    <style name="FieldInput">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:minHeight">48dp</item>
-        <item name="android:background">@drawable/chip_card</item>
-        <item name="android:paddingStart">12dp</item>
-        <item name="android:paddingEnd">12dp</item>
-        <item name="android:textColor">@color/ink</item>
-        <item name="android:textColorHint">@color/muted</item>
+    <style name="Widget.ITantra.Button.Text" parent="Widget.Material3.Button.TextButton">
         <item name="android:textSize">15sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Two-option segmented control (language, tabs) -->
+    <style name="Widget.ITantra.Segment" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/segment_text</item>
+        <item name="backgroundTint">@color/segment_bg</item>
+        <item name="strokeColor">@color/segment_stroke</item>
+        <item name="iconTint">@color/segment_text</item>
+    </style>
+
+    <!-- Round icon button (alert, keyboard, send, header actions) -->
+    <style name="Widget.ITantra.IconButton" parent="Widget.Material3.Button.IconButton">
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconTint">@color/ink_soft</item>
+    </style>
+
+    <style name="Widget.ITantra.IconButton.Filled" parent="Widget.Material3.Button.IconButton.Filled.Tonal">
+        <item name="android:minWidth">52dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconTint">@color/ink_soft</item>
+        <item name="backgroundTint">@color/surface_alt</item>
+    </style>
+
+    <style name="Widget.ITantra.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">14dp</item>
+        <item name="boxCornerRadiusTopEnd">14dp</item>
+        <item name="boxCornerRadiusBottomStart">14dp</item>
+        <item name="boxCornerRadiusBottomEnd">14dp</item>
+        <item name="boxStrokeColor">@color/brand</item>
+        <item name="hintTextColor">@color/brand</item>
+        <item name="helperTextTextColor">@color/muted</item>
+        <item name="helperTextTextAppearance">@style/TextAppearance.ITantra.Helper</item>
+        <item name="errorTextAppearance">@style/TextAppearance.ITantra.Helper</item>
+        <item name="placeholderTextColor">@color/muted</item>
+    </style>
+
+    <style name="TextAppearance.ITantra.Helper" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">13sp</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="Widget.ITantra.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="backgroundTint">@color/surface</item>
+        <item name="shapeAppearance">@style/Shape.ITantra.Sheet</item>
+    </style>
+
+    <style name="Shape.ITantra.Pill" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="Shape.ITantra.Sheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">28dp</item>
+        <item name="cornerSizeTopRight">28dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <!-- Text -->
+    <style name="Text.ITantra.Title" parent="">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <style name="Text.ITantra.Body" parent="">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/ink_soft</item>
+        <item name="android:lineSpacingExtra">3sp</item>
+    </style>
+
+    <style name="Text.ITantra.Label" parent="">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Text.ITantra.Meta" parent="">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/muted</item>
+    </style>
+
+    <!-- The channel name reads like a radio display -->
+    <style name="Text.ITantra.Channel" parent="">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
 </resources>

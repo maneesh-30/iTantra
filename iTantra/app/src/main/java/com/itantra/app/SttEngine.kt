@@ -49,6 +49,13 @@ class SttEngine(assetManager: AssetManager, val language: Language) {
             )
         }
 
+        with(modelConfig) {
+            assetManager.requireAssets(
+                tokens, nemo.model, moonshine.preprocessor, moonshine.encoder,
+                moonshine.uncachedDecoder, moonshine.cachedDecoder,
+            )
+        }
+
         val config = OfflineRecognizerConfig(
             featConfig = FeatureConfig(sampleRate = 16000, featureDim = 80),
             modelConfig = modelConfig,
@@ -70,4 +77,39 @@ class SttEngine(assetManager: AssetManager, val language: Language) {
     fun release() {
         recognizer.release()
     }
+}
+
+/**
+ * One speech recognizer for the whole app, shared by the talk screen and the accuracy test so
+ * the model (hundreds of MB) is only in memory once. Loading, transcribing and releasing all
+ * hold the same lock, so a model is never released while it is decoding.
+ */
+object Engines {
+    private val lock = Any()
+    private var stt: SttEngine? = null
+
+    /** Run [block] with the recognizer for [lang], loading it first if needed. Slow: call off the main thread. */
+    fun <T> withStt(assets: AssetManager, lang: Language, block: (SttEngine) -> T): T = synchronized(lock) {
+        val engine = stt?.takeIf { it.language == lang } ?: run {
+            stt?.release()
+            stt = null
+            SttEngine(assets, lang).also { stt = it }
+        }
+        block(engine)
+    }
+
+    fun release() = synchronized(lock) {
+        stt?.release()
+        stt = null
+    }
+}
+
+/**
+ * sherpa-onnx ends the whole app (a native exit) if a model file is missing from assets, and no
+ * try/catch can stop that. So check the files first and throw a normal exception instead: both
+ * screens already catch it and show "Failed to load … models". Empty paths (unused) are skipped.
+ */
+internal fun AssetManager.requireAssets(vararg paths: String) {
+    val missing = paths.filter { it.isNotEmpty() && runCatching { open(it).close() }.isFailure }
+    check(missing.isEmpty()) { "Missing model files $missing. Run scripts/download-models, then rebuild." }
 }
